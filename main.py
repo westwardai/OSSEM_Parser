@@ -3,6 +3,7 @@
 import argparse, os, sys
 from functools import reduce
 import mistune
+from mistune import Markdown
 
 __version__ = '0.0.1'
 __author__ = 'Zack Payton <zack.payton@westward.ai>'
@@ -12,9 +13,14 @@ class DictRenderer(mistune.Renderer):
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
     self.object_data = {}
+    self.description_next = False
   #def placeholder(self):
-  #  return
+  #  return {}
     #raise NotImplementedError("placeholder has not been implemented")
+  def lower_under_joined(self, text):
+    return '_'.join(list(map(lambda w: w.lower(), text.split(' '))))
+  def get_python_dict(self):
+    return self.object_data
   def block_code(self, code, lang=None):
     print("block_code: {} lang: {}".format(code, lang))
     #raise NotImplementedError("block_code has not been implemented")
@@ -27,9 +33,13 @@ class DictRenderer(mistune.Renderer):
     raise NotImplementedError("block_html has not been implemented")
   def header(self, text, level, raw=None):
     print("header: {} level: {}".format(text, level))
-    if not 'header' in self.object_data:
-      self.object_data['headers'] = []
-    self.object_data['headers'].append({'text': text, 'level': level})
+    if level == 1 and 'name' not in self.object_data:
+      self.object_data['name'] = text
+      self.description_next = True
+    if level == 2 and text not in self.object_data:
+      text = self.lower_under_joined(text)
+      self.object_data[self.lower_under_joined(text)] = {}
+
     return text
   def hrule(self):
     print("hrule")
@@ -74,6 +84,9 @@ class DictRenderer(mistune.Renderer):
   def strikethrough(self, text):
     raise NotImplementedError("strikethrough has not been implemented")
   def text(self, text):
+    if self.description_next == True:
+      self.object_data['description'] = text
+      self.description_next = False
     print("text: {}".format(text))
     return text
     #raise NotImplementedError("text has not been implemented")
@@ -114,13 +127,19 @@ class OSSEMParser(object):
     try:
       with open(filename) as file:
         file_content = file.read()
-        self.parse_md(file_content)
+        return self.parse_md(file_content)
     except FileNotFoundError as e:
         print("File not found: {0}".format(filename))
 
   def parse_md(self, markdown):
     dict_renderer = DictRenderer()
-    print(mistune.markdown(markdown, renderer=dict_renderer))
+    #d = mistune.markdown(markdown, renderer=dict_renderer).renderer.get_data_object()
+    md = Markdown(escape=True, renderer=dict_renderer)
+    md.parse(markdown)
+    d = md.renderer.get_python_dict()
+    return d
+
+
 
   def parse_ossem(self, ossem_dir):
     d = {} # data stucture to maintain representation of OSSEM
