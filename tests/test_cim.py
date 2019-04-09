@@ -9,6 +9,8 @@ class TestOSSEMCIM(unittest.TestCase):
   def setUp(self):
     self.p = OSSEMParser()
     self.alert_md = os.path.join("tests", "test_data", "alert.md")
+    self.destination_md = os.path.join("tests", "test_data", "destination.md")
+    self.event_md = os.path.join("tests", "test_data", "event.md")
 
   def test_alert_conversion(self):
     desired_output = {
@@ -51,5 +53,41 @@ class TestOSSEMCIM(unittest.TestCase):
         }
       }
     }
-    print("output: '{}'".format(self.p.parse_md_file(self.alert_md)))
-    #assert(desired_output == self.p.parse_md_file(self.alert_md))
+    assert(desired_output == self.p.parse_cim_md(self.p.read_file(self.alert_md)))
+
+  def test_destination_conversion(self):
+    desired_output = {
+      'name': 'Destination Schema',
+      'description': 'Event fields used to define the destination in a network connection event.',
+      'data_fields': {
+        'dst_ip': {
+          'type': 'ip',
+          'description': 'Destination IP in a network connection (IPv4)',
+          'sample_value': '8.8.8.8'
+        },
+        'dst_ipv6': {
+          'type': 'ip',
+          'description': 'Destination IP in a network connection (IPv6)',
+          'sample_value': 'a968:8228:c46d:95a8:d8ef:30ab:dab3:17f2'
+        },
+        'dst_host_name': {
+          'type': 'string',
+          'description': 'Destination host name in a network connection',
+          'sample_value': 'WKHR001'
+        },
+        'dst_port': {
+          'type': 'integer',
+          'description': 'Destination port number used in a network connection',
+          'sample_value': 53
+        },
+        'dst_port_name': {
+          'type': 'string',
+          'description': 'Destination port name used in a network connection',
+          'sample_value': 'DNS'
+        }
+      }
+    }
+    assert(desired_output == self.p.parse_cim_md(self.p.read_file(self.destination_md)))
+
+  #def test_event_conversion(self):
+  #  print(self.p.parse_md_file(self.event_md))
