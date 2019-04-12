@@ -7,6 +7,7 @@ class TestOSSEMDataDictionaries(unittest.TestCase):
   def setUp(self):
     self.p = OSSEMParser()
     self.sysmon_event_1_md = os.path.join("tests", "test_data", "sysmon-event-1.md")
+    self.osquery_hash_md = os.path.join("tests", "test_data", "osquery-hash.md")
   def test_sysmon_event_1(self):
     expected_output = {
        'meta': {
@@ -36,7 +37,9 @@ class TestOSSEMDataDictionaries(unittest.TestCase):
           'height': 625
         }
       },
-      'event_xml': """<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+      'event_data': {
+        'type': 'xml',
+        'data': """<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
   <System>
     <Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}" /> 
     <EventID>1</EventID> 
@@ -75,7 +78,8 @@ class TestOSSEMDataDictionaries(unittest.TestCase):
     <Data Name="ParentImage">C:\Windows\System32\cmd.exe</Data> 
     <Data Name="ParentCommandLine">"C:\WINDOWS\system32\cmd.exe"</Data> 
   </EventData>
-</Event>""",
+</Event>"""
+      },
       'data_dictionary': {
         'event_date_creation': {
           'field_name': 'UtcTime',
@@ -211,17 +215,52 @@ class TestOSSEMDataDictionaries(unittest.TestCase):
         }
       }
     }
-    #from pprint import pprint
-    #print(self.p.parse_dd_md(self.p.read_file(self.sysmon_event_1_md)))
-    #case_a = self.p.parse_dd_md(self.p.read_file(self.sysmon_event_1_md))
-    #case_b = expected_output
-    #from pprint import pprint
-    #i=0
-    #for c in case_a['event_xml']:
-    ##  print("a: {} b: {}".format(case_a['event_xml'][i], case_b['event_xml'][i]))
-    #  if case_a['event_xml'][i] != case_b['event_xml'][i]:
-    #    print("=======================================")
-    #  i += 1
-
-
     assert(self.p.parse_dd_md(self.p.read_file(self.sysmon_event_1_md)) == expected_output)
+
+  def test_windows_osquery_hash(self):
+    expected_output = {
+      'title': 'Hash Table',
+      'description': {
+        'text': 'Filesystem hash data.',
+        'links': [
+          {
+            'text': 'osquery GitHub',
+            'link': 'https://github.com/facebook/osquery/blob/master/specs/hash.table'
+          }
+        ]
+      },
+      #'event_log_illustration': {}, # if this section is blank we don't currently default populate it
+      'data_dictionary': {
+        'file_path': {
+          'field_name': 'path',
+          'type': 'TEXT',
+          'description': 'Must provide a path or directory',
+          'sample_value': ''
+        },
+        'file_directory': {
+          'field_name': 'directory',
+          'type': 'TEXT',
+          'description': 'Must provide a path or directory',
+          'sample_value': ''
+        },
+        'hash_md5': {
+          'field_name': 'md5',
+          'type': 'TEXT',
+          'description': 'MD5 hash of provided filesystem data',
+          'sample_value': ''
+        },
+        'hash_sha1': {
+          'field_name': 'sha1',
+          'type': 'TEXT',
+          'description': 'SHA1 hash of provided filesystem data',
+          'sample_value': ''
+        },
+        'hash_sha256': {
+          'field_name': 'sha256',
+          'type': 'TEXT',
+          'description': 'SHA256 hash of provided filesystem data',
+          'sample_value': ''
+        }
+      }
+    }
+    assert(self.p.parse_dd_md(self.p.read_file(self.osquery_hash_md)) == expected_output)
