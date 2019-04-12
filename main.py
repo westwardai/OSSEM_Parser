@@ -261,7 +261,6 @@ class DataDictionaryDictRenderer(DictRenderer):
       language = detect_language(code)
       self.object_data['event_data' ] = { 'type': language, 'data': code }
 
-      
     return code
 
 class OSSEMParser(object):
@@ -307,37 +306,6 @@ class OSSEMParser(object):
     print("dd: {}".format(dd))
     return dd
 
-  '''
-  def parse_data_dictionaries(self, ossem_dir):
-    dd_dir = os.path.join(ossem_dir, 'data_dictionaries')
-    dd = {'os': {} }
-    oses = [f for f in os.listdir(dd_dir) if os.path.isdir(os.path.join(dd_dir, f))]
-    for o in oses:
-      dd[o] = {}
-      for data_source in os.listdir(os.path.join(dd_dir,o)):
-        data_source_dir = os.path.join(dd_dir, o, data_source)
-        #print("data_source_dir: {}".format(data_source_dir))
-        dd[o][data_source] = {}
-        start = data_source_dir.rfind(os.sep) + 1
-        for root, subdirs, files in os.walk(data_source_dir):
-          folders = root[start:].split(os.sep)
-          subdir = dict.fromkeys(files)
-          parent = reduce(dict.get, folders[:1], dd)
-          parent[folders[-1]] = subdir
-          #print("root: {} subdirs: {} files: {}".format(root, subdirs, files))
-          md_files = [f for f in files if f.lower().endswith('.md')]
-          for md_file in md_files:
-            # ignore README.md for now
-            if md_file.lower() == "readme.md":
-              continue
-            key = md_file[:-3] # remove the .md for the key to be used
-            full_path = os.path.join(root, md_file)
-            output = self.parse_dd_md(self.read_file(full_path))
-            if key.lower().startswith("event-"):
-              key = key[6:]
-            dd[o][data_source][key] = output
-    return dd
-'''
   def parse_ossem(self, ossem_dir):
     ossem = {} # data stucture to maintain representation of OSSEM
     ossem_dir = ossem_dir.rstrip(os.sep)
@@ -345,7 +313,6 @@ class OSSEMParser(object):
     for path, dirs, files in os.walk(ossem_dir):
       dirs[:] = [d for d in dirs if not d.startswith('.')]
       files[:] = [f for f in files if not f.startswith('.')]
-      print("path: {} dirs: {} files: {}".format(path, dirs, files))
       folders = path[start:].split(os.sep)
       key_names = []
       for f in files:
@@ -365,35 +332,9 @@ class OSSEMParser(object):
               if k['file'] == f:
                 subdir[k['key']] = self.parse_dd_md(self.read_file(p))
 
-            
-
-
-      print("subdir: {}".format(subdir))
       parent = reduce(dict.get, folders[:-1], ossem)
       parent[folders[-1]] = subdir
-    from pprint import pprint
-    pprint(ossem)
 
-    print("ossem_dir: {} start: {}".format(ossem_dir, start))
-    #ossem['data_dictionaries'] = self.parse_data_dictionaries(ossem_dir)
-    #from pprint import pprint
-    #print("OSSEM")
-    #pprint(ossem)
-    #start = ossem_dir.rfind(os.sep) + 1
-    #for root, subdirs, files in os.walk(ossem_dir):
-    #  subdirs[:] = [d for d in subdirs if not d.startswith('.')] # skip hidden directories
-    #  files[:] = [f for f in files if not f.startswith('.') and not f.endswith('png')]
-    #  folders = root[start:].split(os.sep)  # http://code.activestate.com/recipes/577879-create-a-nested-dictionary-from-oswalk/
-    ##  subdir = dict.fromkeys(files)         # this code is discusting and needs to be refactored
-    #  parent = reduce(dict.get, folders[:-1], d) # but it works :(
-    #  parent[folders[-1]] = subdir
-    #  for f in files:
-    #    full_path = os.path.join(root, f)
-    #    if full_path.endswith('OSSEM/README.md'): continue # skip OSSEM/README.md
-    #    print("parsing {}".format(full_path))
-    #    self.parse_md_file(full_path)
-    #from pprint import pprint
-    #pprint(d)
     return ossem
 
 if __name__ == '__main__':
@@ -413,18 +354,14 @@ if __name__ == '__main__':
     parser = OSSEMParser()
     ossem = parser.parse_ossem(args.ossem)
     if output_format == 'json':
-      1
-      #print(json.dumps(ossem))
+      print(json.dumps(ossem))
     elif output_format == 'yaml':
-      1
-      #print(yaml.dump(ossem, default_flow_style=False))
+      print(yaml.dump(ossem, default_flow_style=False))
     elif output_format == 'xml':
-      #from dicttoxml import dicttoxml # we conditionally import this because it's not in python core
-      #print(dicttoxml(ossem))
-      1
+      from dicttoxml import dicttoxml # we conditionally import this because it's not in python core
+      print(dicttoxml(ossem))
     elif output_format == 'python':
-      1
-      #print("{}".format(ossem))
+      print("{}".format(ossem))
   else:
     import unittest
     from tests.test_cim import TestOSSEMCIM
