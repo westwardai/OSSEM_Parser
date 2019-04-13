@@ -13,9 +13,9 @@ VERBOSE = False
 #VERBOSE = True
 
 def detect_language(code):
-  ''' this simple function does its best
+  """ this simple function does its best
       to detect the event output...
-      generally xml or json '''
+      generally xml or json """
   code = code.strip().rstrip()
   if code.startswith('<'):
     return 'xml'
@@ -23,9 +23,10 @@ def detect_language(code):
     return 'json'
   else:
     return 'unknown'
-  
 
 class DictRenderer(mistune.Renderer):
+  """ base class that renders a python dictionary
+      from markdown using mistune """
   def __init__(self, renderer=None, inline=None, block=None, **kwargs):
     super().__init__(**kwargs)
     self.object_data = {}
@@ -35,18 +36,23 @@ class DictRenderer(mistune.Renderer):
     self.current_table_entry = {}
     self.current_table_entry_index = 0
   def lower_under_joined(self, text):
+    """ silly method to convert dictionary keys to a more 'pythonic' representation"""
     return '_'.join(list(map(lambda w: w.lower(), text.split(' ')))) # this will convert something like 'Blase Blah' to 'blase_blah'
   def get_python_dict(self):
+    """ this method can be called to extract the dictionary at the end of the parsing phase """
     return self.object_data
   def block_code(self, code, lang=None):
+    """ handler that gets called when the parser hits markdown block code """
     if VERBOSE:
       print("block_code: {} lang: {}".format(code, lang))
     return code
   def block_quote(self, text):
+    """ handler that gets called when the parser hits markdown block quote """
     if VERBOSE:
       print("block_quote: {}".format(text))
     return text
   def block_html(self, html):
+    """ handler that gets called when the parser hits markdown block html """
     raise NotImplementedError("block_html has not been implemented")
   def hrule(self):
     if VERBOSE:
@@ -274,37 +280,20 @@ class OSSEMParser(object):
         print("File not found: {0}".format(filename))
 
   def parse_cim_md(self, markdown):
-    dict_renderer = CIMDictRenderer()
-    md = Markdown(escape=True, renderer=dict_renderer)
-    md.parse(markdown)
-    d = md.renderer.get_python_dict()
-    return d
+    """ parse markdown structured for OSSEM common information model """
+    return self.parse_md_file(CIMDictRenderer, markdown)
   def parse_dd_md(self, markdown):
-    dict_renderer = DataDictionaryDictRenderer()
+    """ parse markdown structured for OSSEM data dictionaries """
+    return self.parse_md_file(DataDictionaryDictRenderer, markdown)
+  def parse_md_file(self, renderer, markdown):
+    dict_renderer = renderer()
     md = Markdown(escape=True, renderer=dict_renderer)
     md.parse(markdown)
-    d = md.renderer.get_python_dict()
-    return d
-  def parse_data_dictionaries(self, ossem_dir):
-    dd_dir = os.path.join(ossem_dir, 'data_dictionaries')
-    dd = {'os': {} }
-    oses = [f for f in os.listdir(dd_dir) if os.path.isdir(os.path.join(dd_dir, f))]
-    for o in oses:
-      dd[o] = {}
-      for data_source in os.listdir(os.path.join(dd_dir,o)):
-        data_source_dir = os.path.join(dd_dir, o, data_source)
-        #print("data_source_dir: {}".format(data_source_dir))
-        dd[o][data_source] = {}
-        start = data_source_dir.rfind(os.sep) + 1
-        print("walking: {}".format(data_source_dir))
-        for root, subdirs, files in os.walk(data_source_dir):
-          folders = root[start:].split(os.sep)
-          subdir = dict.fromkeys(files)
-          parent = reduce(dict.get, folders[:1], dd)
-          parent[folders[-1]] = subdir
-          #print("root: {} subdirs: {} files: {}".format(root, subdirs, files))
-    print("dd: {}".format(dd))
-    return dd
+    return md.renderer.get_python_dict()
+  def parse_ads_md(self, markdown):
+    """ parse markdown structured for OSSEM attack data sources """
+    dict_renderer = AttackDataSourceDictRenderer()
+    #md = Markdown(escape=True renderer = dict_renderer)
 
   def parse_ossem(self, ossem_dir):
     ossem = {} # data stucture to maintain representation of OSSEM
@@ -324,13 +313,17 @@ class OSSEMParser(object):
         key_names.append({'file': f, 'key': k})
       subdir = dict.fromkeys([k['key'] for k in key_names])
 
-      if 'data_dictionaries' in path:
-        for f in files:
-          if not f.lower() == 'readme.md' and f.lower().endswith('.md'):
-            p = os.path.join(path, f)
-            for k in key_names:
-              if k['file'] == f:
+      for f in files:
+        if not f.lower() == 'readme.md' and f.lower().endswith('.md'):
+          p = os.path.join(path, f)
+          for k in key_names:
+            if k['file'] == f:
+              if 'data_dictionaries' in path:
                 subdir[k['key']] = self.parse_dd_md(self.read_file(p))
+              if 'common_information_model' in path:
+                subdir[k['key']] = self.parse_cim_md(self.read_file(p))
+              #if 'attack_data_sources' in path
+              #  subdir[k['key']] = self.parse_ads_md(self.read_file(p))
 
       parent = reduce(dict.get, folders[:-1], ossem)
       parent[folders[-1]] = subdir
@@ -364,6 +357,7 @@ if __name__ == '__main__':
       print("{}".format(ossem))
   else:
     import unittest
-    from tests.test_cim import TestOSSEMCIM
-    from tests.test_data_dictionaries import TestOSSEMDataDictionaries
+    #from tests.test_cim import TestOSSEMCIM
+    #from tests.test_data_dictionaries import TestOSSEMDataDictionaries
+    from tests.test_attack_data_sources import TestOSSEMADS
     unittest.main()
