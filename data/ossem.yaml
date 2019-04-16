@@ -2649,17 +2649,17 @@ OSSEM:
               links:
               - link: https://www.blackhat.com/docs/us-14/materials/us-14-Kazanciyan-Investigating-Powershell-Attacks-WP.pdf
                 text: Investigating PowerShell Attacks - Mandiant
-              text: "Logs the start and stop of PowerShell. Each time that PowerShell\
-                \ executes \u2013 either upon the execution of a single command, the\
-                \ start of a local session, or the start of a remoting session \u2013\
-                \ this log records an Event ID (EID) 400 message: \u201CEngine state\
-                \ is changed from None to Available.\u201D At the completion of the\
-                \ session, the log records an EID 403 event: \u201CEngine state is\
-                \ changed from Available to Stopped\u201D.\nThe message details for\
-                \ both EID 400 and EID 403 events include a HostName field. If executed\
-                \ locally, this field will be logged as HostName=ConsoleHost. If PowerShell\
-                \ remoting is in use, the accessed system will record these events\
-                \ with HostName=ServerRemoteHost.\u201D"
+              text: 'Logs the start and stop of PowerShell. Each time that PowerShell
+                executes - either upon the execution of a single command, the start
+                of a local session, or the start of a remoting session - this log
+                records an Event ID (EID) 400 message: "Engine state is changed from
+                None to Available." At the completion of the session, the log records
+                an EID 403 event: "Engine state is changed from Available to Stopped".
+
+                The message details for both EID 400 and EID 403 events include a
+                HostName field. If executed locally, this field will be logged as
+                HostName=ConsoleHost. If PowerShell remoting is in use, the accessed
+                system will record these events with HostName=ServerRemoteHost."'
             event_data:
               data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
                 >\n  <System>\n    <Provider Name=\"PowerShell\" /> \n    <EventID\
@@ -2770,17 +2770,17 @@ OSSEM:
               links:
               - link: https://www.blackhat.com/docs/us-14/materials/us-14-Kazanciyan-Investigating-Powershell-Attacks-WP.pdf
                 text: Investigating PowerShell Attacks - Mandiant
-              text: "Logs the start and stop of PowerShell. Each time that PowerShell\
-                \ executes \u2013 either upon the execution of a single command, the\
-                \ start of a local session, or the start of a remoting session \u2013\
-                \ this log records an Event ID (EID) 400 message: \u201CEngine state\
-                \ is changed from None to Available.\u201D At the completion of the\
-                \ session, the log records an EID 403 event: \u201CEngine state is\
-                \ changed from Available to Stopped\u201D.\nThe message details for\
-                \ both EID 400 and EID 403 events include a HostName field. If executed\
-                \ locally, this field will be logged as HostName=ConsoleHost. If PowerShell\
-                \ remoting is in use, the accessed system will record these events\
-                \ with HostName=ServerRemoteHost.\u201D"
+              text: 'Logs the start and stop of PowerShell. Each time that PowerShell
+                executes - either upon the execution of a single command, the start
+                of a local session, or the start of a remoting session - this log
+                records an Event ID (EID) 400 message: "Engine state is changed from
+                None to Available." At the completion of the session, the log records
+                an EID 403 event: "Engine state is changed from Available to Stopped".
+
+                The message details for both EID 400 and EID 403 events include a
+                HostName field. If executed locally, this field will be logged as
+                HostName=ConsoleHost. If PowerShell remoting is in use, the accessed
+                system will record these events with HostName=ServerRemoteHost."'
             event_data:
               data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
                 >\n  <System>\n    <Provider Name=\"PowerShell\" /> \n    <EventID\
@@ -2994,16 +2994,16 @@ OSSEM:
               links:
               - link: https://www.fireeye.com/blog/threat-research/2016/02/greater_visibilityt.html
                 text: FireEye
-              text: "Script block logging records blocks of code as they are executed\
-                \ by the PowerShell engine, thereby capturing the full contents of\
-                \ code executed by an attacker, including scripts and commands. Due\
-                \ to the nature of script block logging, it also records de-obfuscated\
-                \ code as it is executed. For example, in addition to recording the\
-                \ original obfuscated code, script block logging records the decoded\
-                \ commands passed with PowerShell\u2019s -EncodedCommand argument,\
-                \ as well as those obfuscated with XOR, Base64, ROT13, encryption,\
-                \ etc., in addition to the original obfuscated code. Script block\
-                \ logging will not record output from the executed code. "
+              text: 'Script block logging records blocks of code as they are executed
+                by the PowerShell engine, thereby capturing the full contents of code
+                executed by an attacker, including scripts and commands. Due to the
+                nature of script block logging, it also records de-obfuscated code
+                as it is executed. For example, in addition to recording the original
+                obfuscated code, script block logging records the decoded commands
+                passed with PowerShell''s -EncodedCommand argument, as well as those
+                obfuscated with XOR, Base64, ROT13, encryption, etc., in addition
+                to the original obfuscated code. Script block logging will not record
+                output from the executed code. '
             event_data:
               data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
                 >\n  <System>\n    <Provider Name=\"Microsoft-Windows-PowerShell\"\
@@ -3727,9 +3727,9 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4627.md
                 text: MS Source
-              text: "This event generates with \u201C4624(S): An account was successfully\
-                \ logged on\u201D and shows the list of groups that the logged-on\
-                \ account belongs to."
+              text: 'This event generates with "4624(S): An account was successfully
+                logged on" and shows the list of groups that the logged-on account
+                belongs to.'
             meta:
               Event ID 4627: Group membership information
             title: 'Event ID 4627: Group membership information'
@@ -3884,8 +3884,8 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4648.md
                 text: MS Source
-              text: "This event is generated when a process attempts an account logon\
-                \ by explicitly specifying that account\u2019s credentials."
+              text: This event is generated when a process attempts an account logon
+                by explicitly specifying that account's credentials.
             meta:
               Event ID 4648: A logon was attempted using explicit credentials
             title: 'Event ID 4648: A logon was attempted using explicit credentials'
@@ -6816,12 +6816,11 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4751.md
                 text: MS Source
-              text: "This event generates every time a new member was added to a security-disabled\
-                \ (distribution) global group. This event generates only on domain\
-                \ controllers. For every added member you will get separate 4751 event.\
-                \ You will typically see \u201C4750: A security-disabled global group\
-                \ was changed.\u201D event without any changes in it prior to 4751\
-                \ event."
+              text: 'This event generates every time a new member was added to a security-disabled
+                (distribution) global group. This event generates only on domain controllers.
+                For every added member you will get separate 4751 event. You will
+                typically see "4750: A security-disabled global group was changed."
+                event without any changes in it prior to 4751 event.'
             meta:
               Event ID 4751: A member was added to a security-disabled global group
             title: 'Event ID 4751: A member was added to a security-disabled global
@@ -7030,9 +7029,9 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4764.md
                 text: MS Source
-              text: "This event generates every time group\u2019s type is changed.\
-                \ This event generates for both security and distribution groups.\
-                \ This event generates only on domain controllers."
+              text: This event generates every time group's type is changed. This
+                event generates for both security and distribution groups. This event
+                generates only on domain controllers.
             meta:
               Event ID 4764: "A group\u2019s type was changed"
             title: "Event ID 4764: A group\u2019s type was changed"
@@ -7180,13 +7179,12 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4768.md
                 text: MS Source
-              text: "This event generates every time Key Distribution Center issues\
-                \ a Kerberos Ticket Granting Ticket (TGT). This event generates only\
-                \ on domain controllers. If TGT issue fails then you will see Failure\
-                \ event with Result Code field not equal to \u201C0x0\u201D. This\
-                \ event doesn't generate for Result Codes: 0x10, 0x17 and 0x18. Event\
-                \ \u201C4771: Kerberos pre-authentication failed.\u201D generates\
-                \ instead."
+              text: 'This event generates every time Key Distribution Center issues
+                a Kerberos Ticket Granting Ticket (TGT). This event generates only
+                on domain controllers. If TGT issue fails then you will see Failure
+                event with Result Code field not equal to "0x0". This event doesn''t
+                generate for Result Codes: 0x10, 0x17 and 0x18. Event "4771: Kerberos
+                pre-authentication failed." generates instead.'
             meta:
               Event ID 4768: A Kerberos authentication ticket (TGT) was requested
             title: 'Event ID 4768: A Kerberos authentication ticket (TGT) was requested'
@@ -7267,14 +7265,13 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4769.md
                 text: MS Source
-              text: "This event generates every time Key Distribution Center gets\
-                \ a Kerberos Ticket Granting Service (TGS) ticket request. This event\
-                \ generates only on domain controllers. If TGS issue fails then you\
-                \ will see Failure event with Failure Code field not equal to \u201C\
-                0x0\u201D. You will typically see many Failure events with Failure\
-                \ Code \u201C0x20\u201D, which simply means that a TGS ticket has\
-                \ expired. These are informational messages and have little to no\
-                \ security relevance."
+              text: This event generates every time Key Distribution Center gets a
+                Kerberos Ticket Granting Service (TGS) ticket request. This event
+                generates only on domain controllers. If TGS issue fails then you
+                will see Failure event with Failure Code field not equal to "0x0".
+                You will typically see many Failure events with Failure Code "0x20",
+                which simply means that a TGS ticket has expired. These are informational
+                messages and have little to no security relevance.
             meta:
               Event ID 4769: A Kerberos service ticket was requested
             title: 'Event ID 4769: A Kerberos service ticket was requested'
@@ -7414,15 +7411,14 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4771.md
                 text: MS Source
-              text: "This event generates every time the Key Distribution Center fails\
-                \ to issue a Kerberos Ticket Granting Ticket (TGT). This can occur\
-                \ when a domain controller doesn\u2019t have a certificate installed\
-                \ for smart card authentication (for example, with a \u201CDomain\
-                \ Controller\u201D or \u201CDomain Controller Authentication\u201D\
-                \ template), the user\u2019s password has expired, or the wrong password\
-                \ was provided. This event generates only on domain controllers. This\
-                \ event is not generated if \u201CDo not require Kerberos preauthentication\u201D\
-                \ option is set for the account."
+              text: This event generates every time the Key Distribution Center fails
+                to issue a Kerberos Ticket Granting Ticket (TGT). This can occur when
+                a domain controller doesn't have a certificate installed for smart
+                card authentication (for example, with a "Domain Controller" or "Domain
+                Controller Authentication" template), the user's password has expired,
+                or the wrong password was provided. This event generates only on domain
+                controllers. This event is not generated if "Do not require Kerberos
+                preauthentication" option is set for the account.
             meta:
               Event ID 4771: Kerberos pre-authentication failed
             title: 'Event ID 4771: Kerberos pre-authentication failed'
@@ -7432,9 +7428,9 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4772.md
                 text: MS Source
-              text: "Currently this event doesn\u2019t generate. It is a defined event,\
-                \ but it is never invoked by the operating system. 4768 failure event\
-                \ is generated instead."
+              text: Currently this event doesn't generate. It is a defined event,
+                but it is never invoked by the operating system. 4768 failure event
+                is generated instead.
             meta:
               Event ID 4772: A Kerberos authentication ticket request failed
             title: 'Event ID 4772: A Kerberos authentication ticket request failed'
@@ -7444,9 +7440,9 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4773.md
                 text: MS Source
-              text: "Currently this event doesn\u2019t generate. It is a defined event,\
-                \ but it is never invoked by the operating system. 4769 failure event\
-                \ is generated instead."
+              text: Currently this event doesn't generate. It is a defined event,
+                but it is never invoked by the operating system. 4769 failure event
+                is generated instead.
             meta:
               Event ID 4773: A Kerberos service ticket request failed
             title: 'Event ID 4773: A Kerberos service ticket request failed'
@@ -7690,9 +7686,9 @@ OSSEM:
               links:
               - link: https://github.com/MicrosoftDocs/windows-itpro-docs/blob/master/windows/security/threat-protection/auditing/event-4782.md
                 text: MS Source
-              text: "This event generates on domain controllers during password migration\
-                \ of an account using Active Directory Migration Toolkit. Typically\
-                \ \u201CSubject"
+              text: This event generates on domain controllers during password migration
+                of an account using Active Directory Migration Toolkit. Typically
+                "Subject
             meta:
               Event ID 4782: The password hash an account was accessed
             title: 'Event ID 4782: The password hash an account was accessed'
@@ -9846,15 +9842,15 @@ OSSEM:
             links:
             - link: https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon#event-id-10-processaccess
               text: Sysmon Source
-            text: "The process accessed event reports when a process opens another\
-              \ process, an operation that\u2019s often followed by information queries\
-              \ or reading and writing the address space of the target process. This\
-              \ enables detection of hacking tools that read the memory contents of\
-              \ processes like Local Security Authority (Lsass.exe) in order to steal\
-              \ credentials for use in Pass-the-Hash attacks. Enabling it can generate\
-              \ significant amounts of logging if there are diagnostic utilities active\
-              \ that repeatedly open processes to query their state, so it generally\
-              \ should only be done so with filters that remove expected accesses."
+            text: The process accessed event reports when a process opens another
+              process, an operation that's often followed by information queries or
+              reading and writing the address space of the target process. This enables
+              detection of hacking tools that read the memory contents of processes
+              like Local Security Authority (Lsass.exe) in order to steal credentials
+              for use in Pass-the-Hash attacks. Enabling it can generate significant
+              amounts of logging if there are diagnostic utilities active that repeatedly
+              open processes to query their state, so it generally should only be
+              done so with filters that remove expected accesses.
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
@@ -10261,13 +10257,13 @@ OSSEM:
             links:
             - link: https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon#event-id-15-filecreatestreamhash
               text: Sysmon Source
-            text: "This event logs when a named file stream is created, and it generates\
-              \ events that log the hash of the contents of the file to which the\
-              \ stream is assigned (the unnamed stream), as well as the contents of\
-              \ the named stream. There are malware variants that drop their executables\
-              \ or configuration settings via browser downloads, and this event is\
-              \ aimed at capturing that based on the browser attaching a Zone.Identifier\
-              \ \u201Cmark of the web\u201D stream."
+            text: This event logs when a named file stream is created, and it generates
+              events that log the hash of the contents of the file to which the stream
+              is assigned (the unnamed stream), as well as the contents of the named
+              stream. There are malware variants that drop their executables or configuration
+              settings via browser downloads, and this event is aimed at capturing
+              that based on the browser attaching a Zone.Identifier "mark of the web"
+              stream.
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
@@ -11228,14 +11224,13 @@ OSSEM:
             links:
             - link: https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon#event-id-7-image-loaded
               text: Sysmon Source
-            text: "The image loaded event logs when a module is loaded in a specific\
-              \ process. This event is disabled by default and needs to be configured\
-              \ with the \u2013l option. It indicates the process in which the module\
-              \ is loaded, hashes and signature information. The signature is created\
-              \ asynchronously for performance reasons and indicates if the file was\
-              \ removed after loading. This event should be configured carefully,\
-              \ as monitoring all image load events will generate a large number of\
-              \ events."
+            text: The image loaded event logs when a module is loaded in a specific
+              process. This event is disabled by default and needs to be configured
+              with the -l option. It indicates the process in which the module is
+              loaded, hashes and signature information. The signature is created asynchronously
+              for performance reasons and indicates if the file was removed after
+              loading. This event should be configured carefully, as monitoring all
+              image load events will generate a large number of events.
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
