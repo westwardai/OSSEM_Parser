@@ -130,6 +130,7 @@ class DictRenderer(mistune.Renderer):
       print("table_row: {}".format(content))
     self.table_headers_done = True #table_row gets called by mistune at the end of the row
     self.entry_length = len(self.table_headers)
+    self.first_table_column_name = self.table_headers[0]
     return content
   def table_cell(self, content, **flags):
     if VERBOSE:
@@ -142,14 +143,15 @@ class DictRenderer(mistune.Renderer):
         print("current_table_entry: {} current_table_entry_index: {}".format(self.current_table_entry, self.current_table_entry_index))
       self.current_table_entry_index += 1
       if self.current_table_entry_index >= self.entry_length:
-        standard_name = self.current_table_entry['standard_name']
-        if self.current_table_entry['type'] == 'integer':
+        #standard_name = self.current_table_entry['standard_name']
+        first_table_column_value = self.current_table_entry[self.table_headers[0]]
+        if 'type' in self.current_table_entry and self.current_table_entry['type'] == 'integer':
           try:
             self.current_table_entry['sample_value'] = int(self.current_table_entry['sample_value'], 0)
           except Exception as e:
             self.current_table_entry['sample_value'] = None
-        del self.current_table_entry['standard_name']
-        self.object_data[self.fields_key][standard_name] = self.current_table_entry
+        del self.current_table_entry[self.first_table_column_name]
+        self.object_data[self.fields_key][first_table_column_value] = self.current_table_entry
         self.current_table_entry = {}
         self.current_table_entry_index = 0
     return content
@@ -266,8 +268,70 @@ class DataDictionaryDictRenderer(DictRenderer):
     if self.evi_next:
       language = detect_language(code)
       self.object_data['event_data' ] = { 'type': language, 'data': code }
-
     return code
+
+class AttackDataSourceDictRenderer(DictRenderer):
+  def __init__(self, **kwargs): 
+    super().__init__(**kwargs)
+    self.name_complete = False
+    self.description_complete = False
+  def text(self, text):
+    if VERBOSE:
+      print("text: '{}'".format(text))
+    if self.name_complete and not self.description_complete:
+      #self.object_data['description'] = { 'text': text }
+      self.object_data['description'] = text
+      self.description_complete = True
+    return text
+  def header(self, text, level, raw=None):
+    if VERBOSE:
+      print("header: {} level: {}".format(text, level))
+    if level == 1:
+      self.object_data['name'] = text
+      self.name_complete = True
+    if level == 2 and text not in self.object_data:
+      text = self.lower_under_joined(text)
+      self.fields_key = self.lower_under_joined(text)
+      self.object_data[self.fields_key] = {}
+    return text
+
+class DetectionDataModelDictRenderer(DictRenderer):
+  def __init__(self, **kwargs):
+    super().__init__(**kwargs)
+    self.table_headers = []
+    self.table_headers_complete = False
+    self.table_rows = []
+    self.current_table_row = {}
+    self.column_index = 0
+    self.object_data['rows'] = []
+  def text(self, text):
+    if VERBOSE:
+      print("text: {}".format(text))
+    return text
+  def header(self, text, level, raw=None):
+    if VERBOSE:
+      print("haeder: {} level: {}".format(text, level))
+    if level == 1:
+      self.object_data['name'] = text
+    return text
+  def table_cell(self, content, **flags):
+    if VERBOSE:
+      print("table_cell: {}".format(content))
+    if not self.table_headers_complete:
+      self.table_headers.append(content)
+    else:
+      self.current_table_row[self.table_headers[self.column_index]] = content
+      self.column_index += 1
+    return content
+  def table_row(self, content):
+    if VERBOSE:
+      print("table_row: {}".format(content))
+    self.table_headers_complete = True
+    if len(self.current_table_row) > 0:
+      self.object_data['rows'].append(self.current_table_row)
+    self.current_table_row = {}
+    self.column_index = 0
+    return content
 
 class OSSEMParser(object):
   def read_file(self, filename):
@@ -285,15 +349,20 @@ class OSSEMParser(object):
   def parse_dd_md(self, markdown):
     """ parse markdown structured for OSSEM data dictionaries """
     return self.parse_md_file(DataDictionaryDictRenderer, markdown)
+
+  def parse_ads_md(self, markdown):
+    """ parse markdown structured for OSSEM attack data sources """
+    return self.parse_md_file(AttackDataSourceDictRenderer, markdown)
+
+  def parse_ddm_md(self, markdown):
+    """ parse markdown structured for OSSEM detection data model """
+    return self.parse_md_file(DetectionDataModelDictRenderer, markdown)
+
   def parse_md_file(self, renderer, markdown):
     dict_renderer = renderer()
     md = Markdown(escape=True, renderer=dict_renderer)
     md.parse(markdown)
     return md.renderer.get_python_dict()
-  def parse_ads_md(self, markdown):
-    """ parse markdown structured for OSSEM attack data sources """
-    dict_renderer = AttackDataSourceDictRenderer()
-    #md = Markdown(escape=True renderer = dict_renderer)
 
   def parse_ossem(self, ossem_dir):
     ossem = {} # data stucture to maintain representation of OSSEM
@@ -314,16 +383,20 @@ class OSSEMParser(object):
       subdir = dict.fromkeys([k['key'] for k in key_names])
 
       for f in files:
-        if not f.lower() == 'readme.md' and f.lower().endswith('.md'):
+        if not f.lower() == 'readme.md': # and f.lower().endswith('.md'):
           p = os.path.join(path, f)
           for k in key_names:
             if k['file'] == f:
-              if 'data_dictionaries' in path:
+              if 'data_dictionaries' in path and f.lower().endswith('.md'):
                 subdir[k['key']] = self.parse_dd_md(self.read_file(p))
-              if 'common_information_model' in path:
+              if 'common_information_model' in path and f.lower().endswith('.md'):
                 subdir[k['key']] = self.parse_cim_md(self.read_file(p))
-              #if 'attack_data_sources' in path
-              #  subdir[k['key']] = self.parse_ads_md(self.read_file(p))
+              if 'attack_data_sources' in path and f.lower().endswith('.md'):
+                subdir[k['key']] = self.parse_ads_md(self.read_file(p))
+              if 'detection_data_model' in path and f.lower().endswith('.md'):
+                subdir[k['key']] = self.parse_ddm_md(self.read_file(p))
+              if 'resources/images' in path:
+                subdir[k['key']] = {'link': 'https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/{}'.format(f)}
 
       parent = reduce(dict.get, folders[:-1], ossem)
       parent[folders[-1]] = subdir
@@ -357,7 +430,8 @@ if __name__ == '__main__':
       print("{}".format(ossem))
   else:
     import unittest
-    #from tests.test_cim import TestOSSEMCIM
-    #from tests.test_data_dictionaries import TestOSSEMDataDictionaries
+    from tests.test_cim import TestOSSEMCIM
+    from tests.test_data_dictionaries import TestOSSEMDataDictionaries
     from tests.test_attack_data_sources import TestOSSEMADS
+    #from tests.test_detection_data_model import TestDetectionDataModels
     unittest.main()
