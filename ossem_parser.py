@@ -359,7 +359,7 @@ class DetectionDataModelDictRenderer(DictRenderer):
 
 class OSSEMParser(object):
     def read_file(self, filename):
-        ''' parse a markdown file '''
+        ''' read contents of a file '''
         try:
             with open(filename) as file:
                 file_content = file.read()
