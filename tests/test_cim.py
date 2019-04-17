@@ -3,7 +3,7 @@
     to our desired output """
 
 import unittest, os
-from main import OSSEMParser
+from ossem_parser import OSSEMParser
 
 class TestOSSEMCIM(unittest.TestCase):
     def setUp(self):

@@ -1,7 +1,7 @@
 """ This provides a test suite for parsing OSSEM detction data models """
 
 import unittest, os
-from main import OSSEMParser
+from ossem_parser import OSSEMParser
 
 class TestDetectionDataModels(unittest.TestCase):
     def setUp(self):

@@ -25,8 +25,13 @@ def detect_language(code):
         return 'unknown'
 
 def convert_unicode_quotes_dashes(text):
+    """ this function replaces unicode characters with their ascii counterparts """
     return text.replace(u'\u2019', "'").replace(u'\u2013', '-').replace(u'\u2014', '-').replace(u'\u201C', '"')\
             .replace(u'\u201D', '"').replace(u'\u200B', '').replace(u'\u2026', '...')
+
+def lower_under_joined(text):
+    """ silly method to convert dictionary keys to a more 'pythonic' representation"""
+    return '_'.join(list(map(lambda w: w.lower(), text.split(' ')))) # this will convert something like 'Blase Blah' to 'blase_blah'
 
 class DictRenderer(mistune.Renderer):
     """ base class that renders a python dictionary
@@ -39,9 +44,6 @@ class DictRenderer(mistune.Renderer):
         self.table_headers = []
         self.current_table_entry = {}
         self.current_table_entry_index = 0
-    def lower_under_joined(self, text):
-        """ silly method to convert dictionary keys to a more 'pythonic' representation"""
-        return '_'.join(list(map(lambda w: w.lower(), text.split(' ')))) # this will convert something like 'Blase Blah' to 'blase_blah'
     def get_python_dict(self):
         """ this method can be called to extract the dictionary at the end of the parsing phase """
         return self.object_data
@@ -59,77 +61,95 @@ class DictRenderer(mistune.Renderer):
         """ handler that gets called when the parser hits markdown block html """
         raise NotImplementedError("block_html has not been implemented")
     def hrule(self):
+        """ handler that gets called when the parser hits hrule element in markdown """
         if VERBOSE:
             print("hrule")
         return ''
     def list(self, body, ordered=True):
+        """ handler that gets called when it hits a markdown list """
         if VERBOSE:
             print("body: {} ordered: {}".format(body, ordered))
         return body
     def list_item(self, text):
+        """ handler that gets called when mistune hits an item in a markdown list """
         if VERBOSE:
             print("list_item: {}".format(text))
         return text
     def paragraph(self, text):
+        """ handler that gets called when mistune hits a paragraph in markdown """
         if VERBOSE:
             print("paragraph: {}".format(text))
         return text
     def table(self, header, body):
+        """ handler that gets called when mistune hits a table in markdown """
         if VERBOSE:
             print("table header: {} table body: {}".format(header, body))
         return body
     def double_emphasis(self, text):
+        """ handler that gets called when mistune his double_emphasis in markdown """
         if VERBOSE:
             print("double_emphasis: {}".format(text))
         return text
     def emphasis(self, text):
+        """ handler that gets called when mistune hits emphasis markdown element """
         raise NotImplementedError("emphasis has not been implemented")
     def codespan(self, text):
+        """ handler called when mistune hits codespan """
         raise NotImplementedError("codespan has not been implemented")
     def linebreak(self):
+        """ handler called when mistune hits linebreak markdown """
         raise NotImplementedError("linebreak has not been implemented")
     def strikethrough(self, text):
+        """ handler called when mistune hits strikethrough element """
         raise NotImplementedError("strikethrough has not been implemented")
     def escape(self, text):
+        """ handler called when mistune hits escape element """
         if VERBOSE:
             print("escape: {}".format(text))
         return text
     def autolink(self, link, is_email=False):
+        """ handler called when mistune hits autolink markdown """
         if VERBOSE:
             print("auto_link: {} is_email: {}".format(link, is_email))
         return link
     def link(self, link, title, text):
+        """ handler called when mistune hits link markdown element """
         if VERBOSE:
             print("link: {} title: {} text: {}".format(link, title, text))
         return link
     def image(self, src, title, text):
+        """ handler called when mistune hits image markdown element """
         if VERBOSE:
             print("image src: {} title: {} text: {}".format(src, title, text))
         return src
     def inline_html(self, html):
+        """ handler called when mistune hits inline_html markdown """
         if VERBOSE:
             print("inline_html: {}".format(html))
         return html
     def newline(self):
+        """ handler called when mistune hits a newline """
         raise NotImplementedError("newline has not been implemented")
     def footnote_ref(self, key, index):
+        """ handler called when mistune hits a footnote_ref markdown element """
         raise NotImplementedError("footnote_ref has not been implemented")
     def footnote_item(self, key, text):
+        """ handler called when mistune hits footnote_item markdown element """
         raise NotImplementedError("footnote_item has not been implemented")
     def footnotes(self, text):
+        """ handler called when mistune hits footnotes markdown element """
         raise NotImplementedError("footnotes has not been implemented")
     def header(self, text, level, raw=None):
+        """ handler called when mistune hits header element in markdown """
         raise NotImplementedError("header has not been implemented")
     def header(self, text, level, raw=None):
+        """ handler called when header element parsed by mistune """
         raise NotImplementedError("header has not been implemented")
-    def table_row(self, content):
-        raise NotImplementedError("table_row has not been implemented")
-    def table_cell(self, content, **flags):
-        raise NotImplementedError("table_cell has not been implemented")
     def text(self, text):
+        """ handler called when text is reached during mistune parsing run """
         raise NotImplementedError("text has not been implemented")
-
     def table_row(self, content):
+        """ handler called when table_row is parsed by mistune """
         if VERBOSE:
             print("table_row: {}".format(content))
         self.table_headers_done = True #table_row gets called by mistune at the end of the row
@@ -137,10 +157,11 @@ class DictRenderer(mistune.Renderer):
         self.first_table_column_name = self.table_headers[0]
         return content
     def table_cell(self, content, **flags):
+        """ handler that gets called when mistune hits a table cell in markdown """
         if VERBOSE:
             print("table_cell: {}".format(content))
         if not self.table_headers_done:
-            self.table_headers.append(self.lower_under_joined(content))
+            self.table_headers.append(lower_under_joined(content))
         else:
             self.current_table_entry[self.table_headers[self.current_table_entry_index]] = convert_unicode_quotes_dashes(content)
             if VERBOSE:
@@ -160,7 +181,6 @@ class DictRenderer(mistune.Renderer):
                 self.current_table_entry_index = 0
         return content
 
-
 class CIMDictRenderer(DictRenderer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -172,8 +192,8 @@ class CIMDictRenderer(DictRenderer):
             self.object_data['name'] = text
             self.description_next = True
         if level == 2 and text not in self.object_data:
-            text = self.lower_under_joined(text)
-            self.fields_key = self.lower_under_joined(text)
+            text = lower_under_joined(text)
+            self.fields_key = lower_under_joined(text)
             self.object_data[self.fields_key] = {}
         return text
     def text(self, text):
@@ -243,8 +263,8 @@ class DataDictionaryDictRenderer(DictRenderer):
             self.evi_next = True
             self.description_done = True
         if level == 2 and text.startswith("Data"): # not in self.object_data::
-            text = self.lower_under_joined(text)
-            self.fields_key = self.lower_under_joined(text)
+            text = lower_under_joined(text)
+            self.fields_key = lower_under_joined(text)
             self.object_data[self.fields_key] = {}
         return text
     def link(self, link, title, text):
@@ -294,8 +314,8 @@ class AttackDataSourceDictRenderer(DictRenderer):
             self.object_data['name'] = text
             self.name_complete = True
         if level == 2 and text not in self.object_data:
-            text = self.lower_under_joined(text)
-            self.fields_key = self.lower_under_joined(text)
+            text = lower_under_joined(text)
+            self.fields_key = lower_under_joined(text)
             self.object_data[self.fields_key] = {}
         return text
 
@@ -363,12 +383,14 @@ class OSSEMParser(object):
         return self.parse_md_file(DetectionDataModelDictRenderer, markdown)
 
     def parse_md_file(self, renderer, markdown):
+        """ parse markdown file according to our renderer type """
         dict_renderer = renderer()
         md = Markdown(escape=True, renderer=dict_renderer)
         md.parse(markdown)
         return md.renderer.get_python_dict()
 
     def parse_ossem(self, ossem_dir):
+        """ main method for controlling parsing of OSSEM markdown """
         ossem = {} # data stucture to maintain representation of OSSEM
         ossem_dir = ossem_dir.rstrip(os.sep)
         start = ossem_dir.rfind(os.sep) + 1
@@ -411,7 +433,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='parse markdown file')
     parser.add_argument('--ossem', type=str, help='base directory containing the OSSEM project')
     parser.add_argument('--shell', type=str, help='open an interactive shell to browse ossem data')
-    parser.add_argument('--output', type=str, help='output format (json, yaml, xml, or python supported)', default='yaml')
+    parser.add_argument('--output', '-o', type=str, help='output format (json, yaml, xml, or python supported)', default='yaml')
     args = parser.parse_args()
 
     valid_output = ['json', 'yaml', 'xml', 'python'] # should we add markdown as output?
@@ -431,11 +453,11 @@ if __name__ == '__main__':
             from dicttoxml import dicttoxml # we conditionally import this because it's not in python core
             print(dicttoxml(ossem))
         elif output_format == 'python':
-            print("{}".format(ossem))
+            print("ossem = {}".format(ossem))
     else:
         import unittest
         from tests.test_cim import TestOSSEMCIM
         from tests.test_data_dictionaries import TestOSSEMDataDictionaries
         from tests.test_attack_data_sources import TestOSSEMADS
-        #from tests.test_detection_data_model import TestDetectionDataModels
+        #from tests.test_detection_data_model import TestDetectionDataModels # didn't finish the tests
         unittest.main()
