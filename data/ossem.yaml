@@ -1076,6 +1076,8 @@ OSSEM:
     README: null
     linux:
       README: null
+      crowdstrike-falcon:
+        README: null
       osquery:
         file:
           data_dictionary:
@@ -1172,6 +1174,8 @@ OSSEM:
           title: File Table
     macos:
       README: null
+      crowdstrike-falcon:
+        README: null
       osquery:
         file:
           data_dictionary:
@@ -2299,6 +2303,8 @@ OSSEM:
               : 1450470455,\n    \"type\": \"ingress.event.tamper\"\n}"
             type: json
           title: ingress.event.tamper (Cb Response Tamper)
+      crowdstrike-falcon:
+        README: null
       osquery:
         README: null
         file:
@@ -3649,7 +3655,6 @@ OSSEM:
             meta:
               Event ID 4626: User/Device claims information
             title: 'Event ID 4626: User/Device claims information'
-          4626.md.bak: null
           '4627':
             data_dictionary:
               EventCountTotal:
@@ -14183,8 +14188,12 @@ OSSEM:
         link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/event-8.png
       9.png:
         link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/event-9.png
+      CarbonBlackDataModel.png:
+        link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/CarbonBlackDataModel.png
       OSSEM_logo.png:
         link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/OSSEM_logo.png
+      SysmonDataModel.png:
+        link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/SysmonDataModel.png
       attck_datasource_eventlogs_example.png:
         link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/attck_datasource_eventlogs_example.png
       datasource_dataobject_example.png:
