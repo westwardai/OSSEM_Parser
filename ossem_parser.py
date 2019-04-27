@@ -432,7 +432,6 @@ class OSSEMParser(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='parse markdown file')
     parser.add_argument('--ossem', type=str, help='base directory containing the OSSEM project')
-    parser.add_argument('--shell', type=str, help='open an interactive shell to browse ossem data')
     parser.add_argument('--output', '-o', type=str, help='output format (json, yaml, xml, or python supported)', default='yaml')
     args = parser.parse_args()
 
@@ -457,7 +456,7 @@ if __name__ == '__main__':
     else:
         import unittest
         from tests.test_cim import TestOSSEMCIM
-        from tests.test_data_dictionaries import TestOSSEMDataDictionaries
-        from tests.test_attack_data_sources import TestOSSEMADS
+        #from tests.test_data_dictionaries import TestOSSEMDataDictionaries
+        #from tests.test_attack_data_sources import TestOSSEMADS
         #from tests.test_detection_data_model import TestDetectionDataModels # didn't finish the tests
         unittest.main()
