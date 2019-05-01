@@ -445,22 +445,22 @@ OSSEM:
       name: Host Schema
     ip:
       data_fields:
+        'True':
+          description: string
+          sample_value: IP Protocol type for the connection (TCP/UDP/ICMP etc)
+          type: ip_proto
         dst_ip:
           description: destination IP in a network connection (IPv4)
           sample_value: 8.8.8.8
           type: ip
+        initiated:
+          description: session
+          sample_value: Flag to state the session was initiated or received
+          type: boolean
         ip_address:
           description: IP address of the endpoint where the log was created
           sample_value: 8.8.8.8
           type: ip
-        ip_proto:
-          description: IP Protocol type for the connection (TCP/UDP/ICMP etc)
-          sample_value: TCP
-          type: string
-        session_initiated:
-          description: Flag to state the session was initiated or received
-          sample_value: 'True'
-          type: boolean
         src_ip:
           description: source IP in a network connection (IPV4)
           sample_value: 192.168.1.2
@@ -649,38 +649,69 @@ OSSEM:
       name: Port Schema
     process:
       applicable_data_sources:
-        ../data_dictionaries/windows/sysmon/event-1.md:
-          description: terminated
-          sample_value: process
-          type: ''
-        ../data_dictionaries/windows/sysmon/event-10.md:
-          description: opened
-          sample_value: process
-          type: process
-        Event Name/ID:
-          description: created
-          sample_value: process
-          type: process
-        Source Entity:
-          description: Destination Entity
-          sample_value: Data Source
-          type: Relationship
-        Windows Security Event Log:
-          description: ''
-          sample_value: terminated
-          type: ../data_dictionaries/windows/security/events/event-4689.md
-        created:
-          description: Carbon Black
-          sample_value: ../data_dictionaries/windows/carbonblack/childproc.md
-          type: process
-        process:
-          description: process
-          sample_value: Sysmon
-          type: opened
-        wrote_to:
-          description: Sysmon
-          sample_value: ../data_dictionaries/windows/sysmon/event-8.md
-          type: process
+      - data_source: Windows Security Event Log
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/security/events/event-4688.md
+          text: '4688'
+        relationship: created
+        source_entity: process
+      - data_source: Carbon Black
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/carbonblack/procstart.md
+          text: procstart
+        relationship: created
+        source_entity: process
+      - data_source: Carbon Black
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/carbonblack/childproc.md
+          text: childproc
+        relationship: created
+        source_entity: process
+      - data_source: Sysmon
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/sysmon/event-1.md
+          text: '1'
+        relationship: created
+        source_entity: process
+      - data_source: Windows Security Event Log
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/security/events/event-4689.md
+          text: '4689'
+        relationship: terminated
+        source_entity: ''
+      - data_source: Sysmon
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/sysmon/event-5.md
+          text: '5'
+        relationship: terminated
+        source_entity: ''
+      - data_source: Sysmon
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/sysmon/event-8.md
+          text: '8'
+        relationship: wrote_to
+        source_entity: process
+      - data_source: Sysmon
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/sysmon/event-10.md
+          text: '10'
+        relationship: opened
+        source_entity: process
+      - data_source: Carbon Black
+        destination_entity: process
+        event_name/id:
+          link: ../data_dictionaries/windows/carbonblack/crossprocopen.md
+          text: crossprocopen
+        relationship: opened
+        source_entity: process
       data_fields:
         process_call_trace:
           description: Stack trace of where open process is called
@@ -778,50 +809,76 @@ OSSEM:
       name: Process Schema
     registry:
       applicable_data_sources:
-        ../data_dictionaries/windows/security/object_access/registry/README.md:
-          description: modified
-          sample_value: registry_key
-          type: user
-        ../data_dictionaries/windows/sysmon/event-14.md:
-          description: requested_a_handle
-          sample_value: registry_key
-          type: user
-        Event Name/ID:
-          description: created
-          sample_value: registry_key
-          type: process
-        Source Entity:
-          description: Destination Entity
-          sample_value: Data Source
-          type: Relationship
-        Sysmon:
-          description: process
-          sample_value: deleted
-          type: ../data_dictionaries/windows/sysmon/event-12.md
-        Windows Security Event Log:
-          description: process
-          sample_value: modified
-          type: ../data_dictionaries/windows/security/object_access/registry/README.md
-        deleted:
-          description: Windows Security Event Log
-          sample_value: ../data_dictionaries/windows/security/events/event-4663.md
-          type: registry_key
-        process:
-          description: registry_key
-          sample_value: Sysmon
-          type: modified
-        registry_key:
-          description: ../data_dictionaries/windows/security/events/event-4663.md
-          sample_value: user
-          type: Windows Security Event Log
-        set:
-          description: Sysmon
-          sample_value: ../data_dictionaries/windows/sysmon/event-13.md
-          type: registry_key
-        user:
-          description: registry_key
-          sample_value: Windows Security Event Log
-          type: changed_permissions
+      - data_source: Sysmon
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/sysmon/event-12.md
+          text: '12'
+        relationship: created
+        source_entity: process
+      - data_source: Sysmon
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/sysmon/event-12.md
+          text: '12'
+        relationship: deleted
+        source_entity: process
+      - data_source: Sysmon
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/sysmon/event-13.md
+          text: '13'
+        relationship: set
+        source_entity: process
+      - data_source: Sysmon
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/sysmon/event-14.md
+          text: '14'
+        relationship: modified
+        source_entity: process
+      - data_source: Windows Security Event Log
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/security/events/event-4656.md
+          text: '4656'
+        relationship: requested_a_handle
+        source_entity: user
+      - data_source: Windows Security Event Log
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/security/events/event-4663.md
+          text: '4663'
+        relationship: accessed
+        source_entity: user
+      - data_source: Windows Security Event Log
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/security/events/event-4663.md
+          text: '4663'
+        relationship: deleted
+        source_entity: user
+      - data_source: Windows Security Event Log
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/security/object_access/registry/README.md
+          text: '4670'
+        relationship: changed_permissions
+        source_entity: user
+      - data_source: Windows Security Event Log
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/security/object_access/registry/README.md
+          text: '4657'
+        relationship: modified
+        source_entity: user
+      - data_source: Windows Security Event Log
+        destination_entity: registry_key
+        event_name/id:
+          link: ../data_dictionaries/windows/security/object_access/registry/README.md
+          text: '4657'
+        relationship: modified
+        source_entity: process
       data_fields:
         registry_key_name:
           description: ''
@@ -1081,6 +1138,11 @@ OSSEM:
       osquery:
         file:
           data_dictionary:
+            dale_last_modification:
+              description: Last modification time
+              field_name: mtime
+              sample_value: ''
+              type: BIGINT
             date_creation_time:
               description: (B)irth or (cr)eate time
               field_name: btime
@@ -1089,11 +1151,6 @@ OSSEM:
             date_last_access:
               description: Last access time
               field_name: atime
-              sample_value: ''
-              type: BIGINT
-            date_last_modification:
-              description: Last modification time
-              field_name: mtime
               sample_value: ''
               type: BIGINT
             date_last_status_change:
@@ -1179,6 +1236,11 @@ OSSEM:
       osquery:
         file:
           data_dictionary:
+            dale_last_modification:
+              description: Last modification time
+              field_name: mtime
+              sample_value: ''
+              type: BIGINT
             date_creation_time:
               description: (B)irth or (cr)eate time
               field_name: btime
@@ -1187,11 +1249,6 @@ OSSEM:
             date_last_access:
               description: Last access time
               field_name: atime
-              sample_value: ''
-              type: BIGINT
-            date_last_modification:
-              description: Last modification time
-              field_name: mtime
               sample_value: ''
               type: BIGINT
             date_last_status_change:
@@ -1275,18 +1332,18 @@ OSSEM:
         README: null
         childproc:
           data_dictionary:
+            ? ''
+            : description: Specifies whether this process_guid is the child or the
+                parent
+              field_name: created
+              sample_value: 'true'
+              type: BOOLEAN
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
               field_name: cb_server
               sample_value: cbserver
               type: TEXT
-            created:
-              description: Specifies whether this process_guid is the child or the
-                parent
-              field_name: created
-              sample_value: 'true'
-              type: BOOLEAN
             event_date_creation:
               description: Endpoint timestamp of this event since epoch
               field_name: timestamp
@@ -1368,17 +1425,17 @@ OSSEM:
           title: ingress.event.childproc (Child Process)
         crossprocopen:
           data_dictionary:
+            ? ''
+            : description: Target Process create time represented as a 64-bit Windows
+                FILETIME
+              field_name: target_create_time
+              sample_value: '130921702131467731'
+              type: BIGINT
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
               field_name: cb_server
               sample_value: cbserver
-              type: TEXT
-            cross_process_type:
-              description: 'The type of cross process event: either open_process (opening
-                a handle to another process) or open_thread'
-              field_name: cross_process_type
-              sample_value: open_process
               type: TEXT
             event_date_creation:
               description: Endpoint timestamp of this event since epoch
@@ -1405,12 +1462,6 @@ OSSEM:
               field_name: computer_name
               sample_value: JASON-WIN81-VM
               type: TEXT
-            is_target:
-              description: specifies whether process_guid is the target of the cross
-                process event
-              field_name: is_target
-              sample_value: 'false'
-              type: BOOLEAN
             process_granted_access:
               description: Windows bitfield representing the requested access for
                 this process or thread handle (decimal)
@@ -1443,12 +1494,6 @@ OSSEM:
               field_name: link_sensor
               sample_value: https://cbtests/#/host/7
               type: TEXT
-            target_create_time:
-              description: Target Process create time represented as a 64-bit Windows
-                FILETIME
-              field_name: target_create_time
-              sample_value: '130921702131467731'
-              type: BIGINT
             target_process_guid:
               description: process_guid of the target process
               field_name: target_process_guid
@@ -1498,24 +1543,20 @@ OSSEM:
           title: ingress.event.crossprocopen (Cross Process Open)
         emetmitigation:
           data_dictionary:
-            blocked:
-              description: boolean value describing if the action was successfully
-                blocked by EMET
-              field_name: blocked
-              sample_value: 'true'
-              type: BOOLEAN
+            ? ''
+            : description: The type of EMET mitigation performed to block the operation.
+                Possible values are Dep, Sehop, Asr, Aslr, NullPage, HeapSpray, MandatoryAslr,
+                Eaf, EafPlus, BottomUpAslr, LoadLibrary, MemoryProtection, SimulateExecFlow,
+                StackPivot, CallerChecks, BannedFunctions, DeepHooks, AntiDetours.
+              field_name: mitigation
+              sample_value: Eaf
+              type: TEXT
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
               field_name: cb_server
               sample_value: cbserver
               type: TEXT
-            emet_timestamp:
-              description: timestamp of EMET event represented by a 64-bit Windows
-                FILETIME
-              field_name: emet_timestamp
-              sample_value: '130949318600000000'
-              type: BIGINT
             event_date_creation:
               description: Endpoint timestamp of this event since epoch
               field_name: timestamp
@@ -1540,28 +1581,6 @@ OSSEM:
               description: hostname of the sensor
               field_name: computer_name
               sample_value: JASON-WIN81-VM
-              type: TEXT
-            log_id:
-              description: EMET log ID associated with this emetmitigation event
-              field_name: log_id
-              sample_value: 1032
-              type: INTEGER
-            log_message:
-              description: The full log message generated by EMET
-              field_name: log_message
-              sample_value: 'EMET detected EAF mitigation and will close the application:
-                EMET_Test64.exe\r\n\r\nEAF check failed:\n  Application \t: C:\Users\dan\Desktop\EMET_TEST\EMET_Test64.exe\n  User
-                Name \t: DANWIN764\dan\n  Session ID \t: 1\n  PID \t\t: 0xD10 (3344)\n  TID
-                \t\t: 0xDB4 (3508)\n  Module \t: N/A\n  Mod Base \t: 0x0000000000000000\n  Mod
-                Address \t: 0x000000000297000D\n  Mem Address \t: 0x0000000000000000\n\r\n'
-              type: TEXT
-            mitigation:
-              description: The type of EMET mitigation performed to block the operation.
-                Possible values are Dep, Sehop, Asr, Aslr, NullPage, HeapSpray, MandatoryAslr,
-                Eaf, EafPlus, BottomUpAslr, LoadLibrary, MemoryProtection, SimulateExecFlow,
-                StackPivot, CallerChecks, BannedFunctions, DeepHooks, AntiDetours.
-              field_name: mitigation
-              sample_value: Eaf
               type: TEXT
             process_guid:
               description: Process GUID of offending process
@@ -1616,17 +1635,13 @@ OSSEM:
           title: ingress.event.emetmitigation (EMET Mitigation)
         filemod:
           data_dictionary:
-            action:
-              description: 'Type of file modification: create, write, delete, lastwrite'
-              field_name: action
-              sample_value: create
+            ? ''
+            : description: 'The detected file type of this file. Only valid for "lastwrite"
+                actions. Currently supported file types: PE, ELF, UniversalBin, Eicar,
+                OfficeLegacy, OfficeOpenXml, PDF, PKZIP, LZH, LZW, RAR, TAR, and 7zip.'
+              field_name: filetype_name
+              sample_value: Unknown
               type: TEXT
-            actiontype:
-              description: 'Enum value of the file modification: 1=create, 2=write,
-                4=delete, 8=lastwrite'
-              field_name: actiontype
-              sample_value: 1
-              type: INTEGER
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
@@ -1652,20 +1667,6 @@ OSSEM:
               description: Full file path
               field_name: path
               sample_value: c:\users\admin\appdata\local\google\chrome\user data\b5e2.tmp
-              type: TEXT
-            filetype:
-              description: Enum value of the detected file type of this file. Only
-                valid for "lastwrite" actions. See the CbFileType protobuf definition
-                for the available values.
-              field_name: filetype
-              sample_value: 0
-              type: INTEGER
-            filetype_name:
-              description: 'The detected file type of this file. Only valid for "lastwrite"
-                actions. Currently supported file types: PE, ELF, UniversalBin, Eicar,
-                OfficeLegacy, OfficeOpenXml, PDF, PKZIP, LZH, LZW, RAR, TAR, and 7zip.'
-              field_name: filetype_name
-              sample_value: Unknown
               type: TEXT
             hash:
               description: md5 of process executable
@@ -1804,21 +1805,18 @@ OSSEM:
           title: ingress.event.moduleload (Module Load)
         netconn:
           data_dictionary:
+            ? ''
+            : description: remote ipv4 address of network connection. Maintained for
+                backward compatibility for earlier versions of the event forwarder.
+                See local_ip and remote_ip.
+              field_name: ipv4
+              sample_value: 23.4.187.27
+              type: TEXT
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
               field_name: cb_server
               sample_value: cbserver
-              type: TEXT
-            direction:
-              description: 'Direction of the netconn event: inbound or outbound'
-              field_name: direction
-              sample_value: outbound
-              type: TEXT
-            domain:
-              description: The DNS name of the network peer, if available.
-              field_name: domain
-              sample_value: carbonblack.com
               type: TEXT
             dst_ip:
               description: IP address of the remote system (peer)
@@ -1854,13 +1852,6 @@ OSSEM:
               description: hostname of the sensor
               field_name: computer_name
               sample_value: WIN-OTEMNUTBS23
-              type: TEXT
-            ipv4:
-              description: remote ipv4 address of network connection. Maintained for
-                backward compatibility for earlier versions of the event forwarder.
-                See local_ip and remote_ip.
-              field_name: ipv4
-              sample_value: 23.4.187.27
               type: TEXT
             network_protocol:
               description: 6=TCP, 17=UDP
@@ -1924,22 +1915,8 @@ OSSEM:
           title: ingress.event.netconn (Network Connection)
         processblock:
           data_dictionary:
-            blocked_event:
-              description: 'The type of event that was blocked: either ProcessCreate
-                (the process was terminated immediately upon execution) or RunningProcess
-                (the process was already running on the endpoint when the block was
-                applied).'
-              field_name: blocked_event
-              sample_value: ProcessCreate
-              type: TEXT
-            blocked_reason:
-              description: The reason for block action (Md5Hash is the only possible
-                value)
-              field_name: blocked_reason
-              sample_value: Md5Hash
-              type: TEXT
-            blocked_result:
-              description: 'The result of the blocked action: ProcessTerminated, NotTerminatedCBProcess,
+            ? ''
+            : description: 'The result of the blocked action: ProcessTerminated, NotTerminatedCBProcess,
                 NotTerminatedSystemProcess, NotTerminatedCriticalSystemProcess, NotTerminatedWhitelistPath,
                 NotTerminatedOpenProcessError, or NotTerminatedTerminateError.'
               field_name: blocked_result
@@ -2023,6 +2000,12 @@ OSSEM:
           title: ingress.event.processblock (Process Block)
         procstart:
           data_dictionary:
+            ? ''
+            : description: If the md5 could not be calculated in time then Cb Response
+                will send another procstart with the process md5
+              field_name: expect_followon_w_md5
+              sample_value: 'false'
+              type: BOOLEAN
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
@@ -2044,12 +2027,6 @@ OSSEM:
               field_name: type
               sample_value: ingress.event.procstart
               type: TEXT
-            expect_followon_w_md5:
-              description: If the md5 could not be calculated in time then Cb Response
-                will send another procstart with the process md5
-              field_name: expect_followon_w_md5
-              sample_value: 'false'
-              type: BOOLEAN
             file_path:
               description: file path of the child processes' executable image
               field_name: path
@@ -2159,14 +2136,8 @@ OSSEM:
           title: ingress.event.procstart (Process Start)
         regmod:
           data_dictionary:
-            action:
-              description: 'Type of registry modification. This can be one of: createkey,
-                writeval, delkey, or delval'
-              field_name: action
-              sample_value: writeval
-              type: TEXT
-            actiontype:
-              description: 'Enum value of the registry modification: 1=createkey,
+            ? ''
+            : description: 'Enum value of the registry modification: 1=createkey,
                 2=writeval, 4=delkey, 8=delval'
               field_name: actiontype
               sample_value: 2
@@ -2253,6 +2224,12 @@ OSSEM:
           title: ingress.event.regmod (Registry Modification)
         tamper:
           data_dictionary:
+            ? ''
+            : description: 'The activity which triggered this tamper event: CoreDriverUnloaded,
+                NetworkDriverUnloaded, CbServiceStopped, CbProcessTerminated, or CbCodeInjection'
+              field_name: tamper_type
+              sample_value: CbProcessTerminated
+              type: TEXT
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
@@ -2284,12 +2261,6 @@ OSSEM:
               field_name: sensor_id
               sample_value: 1
               type: INTEGER
-            tamper_type:
-              description: 'The activity which triggered this tamper event: CoreDriverUnloaded,
-                NetworkDriverUnloaded, CbServiceStopped, CbProcessTerminated, or CbCodeInjection'
-              field_name: tamper_type
-              sample_value: CbProcessTerminated
-              type: TEXT
           description:
             links:
             - link: https://developer.carbonblack.com/reference/enterprise-response/event-forwarder/event-schema/#ingress-event-tamper-cb-response-tamper
@@ -3570,49 +3541,44 @@ OSSEM:
             title: 'Event ID 4625: An account failed to log on'
           '4626':
             data_dictionary:
-              event_count_total:
-                description: The name of the authentication package which was used
-                  for the logon authentication process. Default packages loaded on
-                  LSA startup are located in "HKLM\SYSTEM\CurrentControlSet\Control\Lsa\OSConfig"
+              EventCountTotal:
+                description: '1'
+                field_name: integer
+                sample_value: logon_user_claims
+                type: The name of the authentication package which was used for the
+                  logon authentication process. Default packages loaded on LSA startup
+                  are located in "HKLM\SYSTEM\CurrentControlSet\Control\Lsa\OSConfig"
                   registry key.
-                field_name: EventCountTotal
-                sample_value: 1
-                type: integer
-              event_sequence_id:
-                description: If is there is not enough space in one event to put all
-                  claims, you will see "1 of N" in this field and additional events
-                  will be generated. Typically this field has "1 of 1" value.
-                field_name: EventIdx
-                sample_value: 1
-                type: integer
-              logon_device_claims:
-                description: list of device claims for new logon session
-                field_name: DeviceClaims
-                sample_value: '-'
-                type: string
-              logon_type:
-                description: the type of logon which was performed.
-                field_name: LogonType
-                sample_value: 3
-                type: integer
-              logon_user_claims:
-                description: list of user claims for new logon session. This field
-                  contains user claims if user account was logged in and device claims
-                  if computer account was logged in
-                field_name: UserClaims
-                sample_value: 'ad://ext/cn:88d2b96fdb2b4c49 <%%1818> : "dadmin" ad://ext/Department:88d16a8edaa8c66b
+              EventIdx:
+                description: '1'
+                field_name: integer
+                sample_value: event_count_total
+                type: If is there is not enough space in one event to put all claims,
+                  you will see "1 of N" in this field and additional events will be
+                  generated. Typically this field has "1 of 1" value.
+              LogonType:
+                description: '3'
+                field_name: integer
+                sample_value: event_sequence_id
+                type: the type of logon which was performed.
+              UserClaims:
+                description: 'ad://ext/cn:88d2b96fdb2b4c49 <%%1818> : "dadmin" ad://ext/Department:88d16a8edaa8c66b
                   <%%1818> : "IT"'
-                type: string
+                field_name: string
+                sample_value: logon_device_claims
+                type: list of user claims for new logon session. This field contains
+                  user claims if user account was logged in and device claims if computer
+                  account was logged in
               user_domain:
                 description: subject's domain or computer name.
                 field_name: TargetDomainName
                 sample_value: CONTOSO
                 type: string
               user_logon_id:
-                description: hexadecimal value that can help you correlate this event
-                  with recent events that might contain the same Logon ID
+                description: 'hexadecimal value that can help you correlate this event
+                  with recent events that might contain the same Logon ID        0x136f7b    '
                 field_name: TargetLogonId
-                sample_value: 1273723
+                sample_value: null
                 type: integer
               user_name:
                 description: the name of the account for which logon was performed
@@ -4654,8 +4620,8 @@ OSSEM:
                 description: Token elevation type. It can be Default(1), Full(2) or
                   Limited(3)
                 field_name: TokenElevationType
-                sample_value: '%%1938'
-                type: string
+                sample_value: null
+                type: integer
               target_user_domain:
                 description: target account's domain or computer name.
                 field_name: TargetDomainName
@@ -6289,8 +6255,8 @@ OSSEM:
             title: 'Event ID 4741: A computer account was created'
           '4742':
             data_dictionary:
-              computer_account_change:
-                description: ''
+              ? ''
+              : description: ''
                 field_name: ComputerAccountChange
                 sample_value: '-'
                 type: string
@@ -8083,38 +8049,8 @@ OSSEM:
             title: 'Event ID 4803: The screen saver was dismissed'
           '4932':
             data_dictionary:
-              destination_dra:
-                description: destination directory replication agent distinguished
-                  name.
-                field_name: DestinationDRA
-                sample_value: CN=NTDS Settings,CN=DC01,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=contoso,DC=local
-                type: string
-              naming_context:
-                description: naming context to replicate.
-                field_name: NamingContext
-                sample_value: CN=Schema,CN=Configuration,DC=contoso,DC=local
-                type: string
-              options:
-                description: decimal value of DRS Options.
-                field_name: Options
-                sample_value: 2147483733
-                type: integer
-              session_id:
-                description: 'unique identifier of replication session. Using this
-                  field you can find "4932: Synchronization of a replica of an Active
-                  Directory naming context has begun." and "4933: Synchronization
-                  of a replica of an Active Directory naming context has ended." events
-                  for the same session.'
-                field_name: SessionID
-                sample_value: 48
-                type: integer
-              source_dra:
-                description: source directory replication agent distinguished name.
-                field_name: SourceDRA
-                sample_value: CN=NTDS Settings,CN=WIN2012R2,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=contoso,DC=local
-                type: string
-              start_usn:
-                description: Naming Context's USN number before replication begins.
+              ? ''
+              : description: Naming Context's USN number before replication begins.
                 field_name: StartUSN
                 sample_value: 20869
                 type: integer
@@ -8131,43 +8067,8 @@ OSSEM:
               naming context has begun'
           '4933':
             data_dictionary:
-              destination_dra:
-                description: destination directory replication agent distinguished
-                  name.
-                field_name: DestinationDRA
-                sample_value: CN=NTDS Settings,CN=DC01,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=contoso,DC=local
-                type: string
-              end_usn:
-                description: Naming Context's USN number after replication ends.
-                field_name: EndUSN
-                sample_value: 20869
-                type: integer
-              naming_context:
-                description: naming context to replicate.
-                field_name: NamingContext
-                sample_value: CN=Schema,CN=Configuration,DC=contoso,DC=local
-                type: string
-              options:
-                description: decimal value of DRS Options.
-                field_name: Options
-                sample_value: 2147483733
-                type: integer
-              session_id:
-                description: 'unique identifier of replication session. Using this
-                  field you can find "4932: Synchronization of a replica of an Active
-                  Directory naming context has begun." and "4933: Synchronization
-                  of a replica of an Active Directory naming context has ended." events
-                  for the same session.'
-                field_name: SessionID
-                sample_value: 40
-                type: integer
-              source_dra:
-                description: source directory replication agent distinguished name.
-                field_name: SourceDRA
-                sample_value: CN=NTDS Settings,CN=WIN2012R2,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=contoso,DC=local
-                type: string
-              status_code:
-                description: if there are no issues or errors, the status code will
+              ? ''
+              : description: if there are no issues or errors, the status code will
                   be "0". If an error happened, you will receive Failure event and
                   Status Code will not be equal to "0".
                 field_name: StatusCode
@@ -8989,97 +8890,10 @@ OSSEM:
         README: null
         accesstoken:
           data_dictionary:
-            authentication_id:
-              description: Unique identifier of the logon session this token represents
-              field_name: AuthenticationId
-              sample_value: '351709'
-              type: LONG
-            elevation_type:
-              description: Token's elevation level
+            ? ''
+            : description: Token's elevation level
               field_name: ElevationType
               sample_value: TokenElevationTypeFull
-              type: TEXT
-            id:
-              description: SO Host Data's unique identifier of this instance
-              field_name: Id
-              sample_value: 8C3C0F18E053F361BF80D7BD126F67A5B7BE8241388802ABA430D751F60CD7D3
-              type: TEXT
-            integrity_level:
-              description: Integrity level of token
-              field_name: IntegrityLevel
-              sample_value: HIGH_MANDATORY_LEVEL
-              type: TEXT
-            is_elevated:
-              description: Specifies if the token is elevated
-              field_name: IsElevated
-              sample_value: 'True'
-              type: BOOLEAN
-            logon_session_key:
-              description: SO Host Data's unique identifier of associated logon session
-              field_name: LogonSessionKey
-              sample_value: EC0AC744FFFBE3228F9E73EC60FA74F3BAB8330DFBCA51B269FC8A3B3B5DD7CD
-              type: TEXT
-            modified_id:
-              description: A value that changes each time the token is modified
-              field_name: ModifiedId
-              sample_value: '26239987'
-              type: LONG
-            origin:
-              description: Originating logon session
-              field_name: Origin
-              sample_value: '999'
-              type: LONG
-            owner_name:
-              description: Default owner's name
-              field_name: OwnerName
-              sample_value: BUILTIN\Administrators
-              type: TEXT
-            owner_sid:
-              description: Default owner's security identifier
-              field_name: OwnerSid
-              sample_value: S-1-5-32-544
-              type: TEXT
-            primary_token_key:
-              description: SO Host Data's unique identifier of containing process's
-                primary token
-              field_name: PrimaryTokenKey
-              sample_value: 8C3C0F18E053F361BF80D7BD126F67A5B7BE8241388802ABA430D751F60CD7D3
-              type: TEXT
-            privileges:
-              description: Token's enabled privileges
-              field_name: Privileges
-              sample_value: SeDebugPrivilege;SeChangeNotifyPrivilege;SeImpersonatePrivilege;SeCreateGlobalPrivilege
-              type: TEXT
-            session_id:
-              description: Token's terminal services session
-              field_name: SessionId
-              sample_value: 1
-              type: INTEGER
-            source_type:
-              description: Type of data represented
-              field_name: SourceType
-              sample_value: WinEvent-Token
-              type: TEXT
-            token_id:
-              description: Unique identifier of the token
-              field_name: TokenId
-              sample_value: '26235631'
-              type: LONG
-            type:
-              description: Indicates whether the token is a primary or impersonation
-                token
-              field_name: Type
-              sample_value: TokenPrimary
-              type: TEXT
-            user_sid:
-              description: Security identifier of token's user
-              field_name: UserSid
-              sample_value: S-1-5-21-386661145-2656271985-3844047388-1001
-              type: TEXT
-            username:
-              description: Name of token's user
-              field_name: UserName
-              sample_value: DESKTOP-HMTGQ0R\tester
               type: TEXT
           description:
             text: Get-SOHostData collects Access Tokens from every running Process
@@ -9099,83 +8913,8 @@ OSSEM:
           so-host-data.png: null
         kerberosticketgrantingticket:
           data_dictionary:
-            alt_target_domain_name:
-              description: Synonym for the destination domain
-              field_name: AltTargetDomainName
-              sample_value: deathstar.empire.com
-              type: TEXT
-            client_name:
-              description: The client name in the ticket
-              field_name: ClientName
-              sample_value: DarthVader
-              type: TEXT
-            domain_name:
-              description: The domain that corresponds to the ServiceName
-              field_name: DomainName
-              sample_value: deathstar.empire.com
-              type: TEXT
-            end_time:
-              description: Time at which the ticket expires
-              field_name: EndTime
-              sample_value: 2/19/2028 4:13:40 AM
-              type: DATE
-            id:
-              description: SO Host Data's unique identifier of this instance
-              field_name: Id
-              sample_value: 82E5CB03112897B20C6FF61BE5B9BF7D574B74E5176C51E738BCAB894C98A1E1
-              type: TEXT
-            key_expiration_time:
-              description: Time at which the key expires
-              field_name: KeyExpirationTime
-              sample_value: 1/1/1601 1:00:00 AM
-              type: DATE
-            logon_session_key:
-              description: SO Host Data's unique identifier of associated logon session
-              field_name: LogonSessionKey
-              sample_value: EC0AC744FFFBE3228F9E73EC60FA74F3BAB8330DFBCA51B269FC8A3B3B5DD7CD
-              type: TEXT
-            renew_util:
-              description: The latest time a ticket can be renewed
-              field_name: RenewUntil
-              sample_value: 2/19/2028 4:13:40 AM
-              type: DATE
-            service_name:
-              description: A multiple part, canonical, service name
-              field_name: ServiceName
-              sample_value: krbtgt
-              type: TEXT
-            session_key:
-              description: The session key for the ticket
-              field_name: SessionKey
-              sample_value: D55F31C27D4C4517D4B86D72BF8B7276
-              type: TEXT
-            session_key_type:
-              description: The type of encryption used for the session key
-              field_name: SessionKeyType
-              sample_value: rc4_hmac
-              type: TEXT
-            source_type:
-              description: Type of data represented
-              field_name: SourceType
-              sample_value: WinEvent-KerberosTicketGrantingTicket
-              type: TEXT
-            start_time:
-              description: Time at which the ticket becomes valid
-              field_name: StartTime
-              sample_value: 2/21/2018 4:13:40 AM
-              type: DATE
-            target_domain_name:
-              description: The name of the domain in which the ticket is valid
-              field_name: TargetDomainName
-              sample_value: deathstar.empire.com
-              type: TEXT
-            ticket_flags:
-              description: Ticket flags, as defined in Internet RFC 4120
-              field_name: TicketFlags
-              sample_value: pre_authent, initial, renewable, forwardable
-              type: TEXT
-            time_skew:
-              description: The measured time difference between the current time on
+            ? ''
+            : description: The measured time difference between the current time on
                 the computer issuing the ticket and the computer where the ticket
                 will be used
               field_name: TimeSkew
@@ -9196,136 +8935,11 @@ OSSEM:
           title: 'Source Type: Kerberos Ticket Granting Ticket'
         logonsession:
           data_dictionary:
-            authentication_package:
-              description: Authentication package used to authenticate
-              field_name: AuthenticationPackage
-              sample_value: NTLM
-              type: TEXT
-            dns_domain_name:
-              description: DNS name of the logon session owner
-              field_name: DnsDomainName
-              sample_value: ''
-              type: TEXT
-            failed_attempt_count_since_last_successful_logon:
-              description: ''
-              field_name: FailedAttemptCountSinceLastSuccessfulLogon
-              sample_value: '0'
-              type: ''
-            home_directory:
-              description: Home directory for the user's logon session
-              field_name: HomeDirectory
-              sample_value: ''
-              type: TEXT
-            home_directory_drive:
-              description: Drive location of the home directory
-              field_name: HomeDirectoryDrive
-              sample_value: ''
-              type: TEXT
-            id:
-              description: SO Host Data's unique identifier of this instance
-              field_name: Id
-              sample_value: EC0AC744FFFBE3228F9E73EC60FA74F3BAB8330DFBCA51B269FC8A3B3B5DD7CD
-              type: TEXT
-            kickoff_time:
-              description: Time that the session must end
-              field_name: KickoffTime
-              sample_value: 1/1/1970 1:00:00 AM
-              type: DATE
-            last_failed_logon:
-              description: ''
-              field_name: LastFailedLogon
-              sample_value: '0'
-              type: ''
-            last_successful_logon:
-              description: Information about the last logon
-              field_name: LastSuccessfulLogon
-              sample_value: 0
-              type: INTEGER
-            logoff_time:
-              description: Time when session user logged off
-              field_name: LogoffTime
-              sample_value: 1/1/1970 1:00:00 AM
-              type: DATE
-            logon_domain:
-              description: Domain name used to authenticate
-              field_name: LogonDomain
-              sample_value: ''
-              type: TEXT
-            logon_id:
-              description: Unique identifier for Logon Session
-              field_name: LogonId
-              sample_value: '351709'
-              type: LONG
-            logon_script:
-              description: Script user for logging on
-              field_name: LogonScript
-              sample_value: ''
-              type: TEXT
-            logon_server:
-              description: Server used to authenticate
-              field_name: LogonServer
-              sample_value: DESKTOP-HMTGQ0R
-              type: TEXT
-            logon_time:
-              description: Time the session owner logged on
-              field_name: LogonTime
-              sample_value: 2/20/2018 6:05:46 PM
-              type: DATE
-            logon_type:
-              description: Logon method
-              field_name: LogonType
-              sample_value: Interactive
-              type: TEXT
-            password_can_change:
-              description: Time when password can change
-              field_name: PasswordCanChange
-              sample_value: 8/14/2015 5:43:32 PM
-              type: DATE
-            password_last_set:
-              description: Time when the user last set their password
-              field_name: PasswordLastSet
-              sample_value: 8/13/2015 5:43:32 PM
-              type: DATE
-            password_must_change:
-              description: Time when password must change
+            ? ''
+            : description: Time when password must change
               field_name: PasswordMustChange
               sample_value: 1/1/1970 1:00:00 AM
               type: DATE
-            profile_path:
-              description: Path of the user's profile
-              field_name: ProfilePath
-              sample_value: ''
-              type: TEXT
-            session:
-              description: Terminal services session identifier
-              field_name: Session
-              sample_value: '1'
-              type: LONG
-            sid:
-              description: User's security identifier
-              field_name: Sid
-              sample_value: S-1-5-21-386661145-2656271985-3844047388-1001
-              type: TEXT
-            source_type:
-              description: Type of data represented
-              field_name: SourceType
-              sample_value: WinEvent-LogonSession
-              type: TEXT
-            upn:
-              description: User principal name of the logon session owner
-              field_name: Upn
-              sample_value: ''
-              type: TEXT
-            user_flags:
-              description: User flags for logon session
-              field_name: UserFlags
-              sample_value: 33056
-              type: INTEGER
-            username:
-              description: Account name that owns the logon session
-              field_name: UserName
-              sample_value: tester
-              type: TEXT
           description:
             text: Get-SOHostData uses the LsaEnumerateLogonSessions and LsaGetLogonSessionData
               APIs to enumerate active Logon Sessions running on the target system.
@@ -9340,55 +8954,8 @@ OSSEM:
           title: SO Host Data - Logon Session Table
         memoryregion:
           data_dictionary:
-            allocation_base:
-              description: The base address of a range of pages allocated by the VirtualAlloc
-                function
-              field_name: AllocationBase
-              sample_value: '1896232255488'
-              type: LONG
-            allocation_protect:
-              description: The memory protection option when the region was initially
-                allocated
-              field_name: AllocationProtect
-              sample_value: PAGE_EXECUTE_READWRITE
-              type: TEXT
-            base_address:
-              description: The base address of the region of pages
-              field_name: BaseAddress
-              sample_value: '1896232255488'
-              type: LONG
-            id:
-              description: SO Host Data's unique identifier of this instance
-              field_name: Id
-              sample_value: 702B162209227ABEAB3980BA3B3252CF391233747B036B9F65DAF2E015579019
-              type: TEXT
-            process_key:
-              description: SO Host Data's unique identifier of containing process
-              field_name: ProcessKey
-              sample_value: BBB8A0D8A8A3EF0148FE5E4DF188E7FC39741EE4554152B9E6513FE95F4E377B
-              type: TEXT
-            protect:
-              description: The access protection of the pages in the region
-              field_name: Protect
-              sample_value: PAGE_EXECUTE_READWRITE
-              type: TEXT
-            region_size:
-              description: The size of the region starting at the base address
-              field_name: RegionSize
-              sample_value: '4096'
-              type: LONG
-            source_type:
-              description: Type of data represented
-              field_name: SourceType
-              sample_value: WinEvent-MemoryRegion
-              type: TEXT
-            state:
-              description: The state of the pages in the region
-              field_name: State
-              sample_value: MEM_COMMIT
-              type: TEXT
-            type:
-              description: The type of pages in the region
+            ? ''
+            : description: The type of pages in the region
               field_name: Type
               sample_value: MEM_PRIVATE
               type: TEXT
@@ -9406,55 +8973,10 @@ OSSEM:
           title: SO Host Data - Memory Region Table
         process:
           data_dictionary:
-            command_line:
-              description: The command string used to launch the process
+            ? ''
+            : description: The command string used to launch the process
               field_name: CommandLine
               sample_value: '"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"'
-              type: TEXT
-            id:
-              description: SO Host Data's unique identifier of this instance
-              field_name: Id
-              sample_value: BBB8A0D8A8A3EF0148FE5E4DF188E7FC39741EE4554152B9E6513FE95F4E377B
-              type: TEXT
-            parent_process_key:
-              description: SO Host Data's unique identifier of parent process
-              field_name: ParentProcessKey
-              sample_value: B8148C17D1C227B6D50E54CB6EF93738852340CF4682E63292F1197330BBE579
-              type: TEXT
-            path:
-              description: The location of the process binary on disk
-              field_name: Path
-              sample_value: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-              type: TEXT
-            process_id:
-              description: Process's unique identifier
-              field_name: ProcessId
-              sample_value: 8540
-              type: INTEGER
-            process_name:
-              description: Name of the process
-              field_name: ProcessName
-              sample_value: powershell
-              type: TEXT
-            sha256_hash:
-              description: SHA256Hash of the process's main module on disk
-              field_name: SHA256Hash
-              sample_value: CCC8538DD62F20999717E2BBAB58A18973B938968D699154DF9233698A899EFA
-              type: TEXT
-            source_type:
-              description: Type of data represented
-              field_name: SourceType
-              sample_value: WinEvent-Process
-              type: TEXT
-            start_time:
-              description: The time the process was started
-              field_name: StartTime
-              sample_value: 2/20/2018 11:00:09 PM
-              type: DATE
-            token_key:
-              description: SO Host Data's unique identifier of associated access token
-              field_name: TokenKey
-              sample_value: 8C3C0F18E053F361BF80D7BD126F67A5B7BE8241388802ABA430D751F60CD7D3
               type: TEXT
           description:
             text: Get-SOHostData enumerates active processes on the scanned system.
@@ -9471,93 +8993,8 @@ OSSEM:
           title: SO Host Data - Process Table
         thread:
           data_dictionary:
-            base_priority:
-              description: The base priority of the thread
-              field_name: BasePriority
-              sample_value: 8
-              type: INTEGER
-            current_priority:
-              description: The current priority of the thread
-              field_name: CurrentPriority
-              sample_value: 8
-              type: INTEGER
-            id:
-              description: SO Host Data's unique identifier of this instance
-              field_name: Id
-              sample_value: EB4D6E286995C97714EB6EBF8C44E252342E3BAB2B1BF10764FD2386FEBB08D7
-              type: TEXT
-            memory_region_key:
-              description: SO Host Data's unique identifier of associated memory region
-              field_name: MemoryRegionKey
-              sample_value: 702B162209227ABEAB3980BA3B3252CF391233747B036B9F65DAF2E015579019
-              type: TEXT
-            priority_boost_enabled:
-              description: Indicates if the OS should boost the priority of the thread
-                when the main window is active
-              field_name: PriorityBoostEnabled
-              sample_value: 'True'
-              type: BOOLEAN
-            priority_level:
-              description: The priority level of the thread
-              field_name: PriorityLevel
-              sample_value: Normal
-              type: TEXT
-            privileged_processor_time:
-              description: The amount of time the thread has spent in the operating
-                system core
-              field_name: PrivilegedProcessorTime
-              sample_value: 00:00:00
-              type: ''
-            process_key:
-              description: SO Host Data's unique identifier of containing process
-              field_name: ProcessKey
-              sample_value: BBB8A0D8A8A3EF0148FE5E4DF188E7FC39741EE4554152B9E6513FE95F4E377B
-              type: TEXT
-            source_type:
-              description: Type of data represented
-              field_name: SourceType
-              sample_value: WinEvent-Thread
-              type: TEXT
-            start_time:
-              description: Time the thread started
-              field_name: StartTime
-              sample_value: 2/20/2018 11:01:10 PM
-              type: DATE
-            thread_id:
-              description: Unique identifier of the thread
-              field_name: ThreadId
-              sample_value: 4784
-              type: INTEGER
-            thread_start_address:
-              description: The memory address of the function called to start the
-                thread
-              field_name: ThreadStartAddress
-              sample_value: '1896232255488'
-              type: LONG
-            thread_state:
-              description: The current state of the thread
-              field_name: ThreadState
-              sample_value: Wait
-              type: TEXT
-            token_key:
-              description: SO Host Data's unique identifier of associated access token
-              field_name: TokenKey
-              sample_value: 8C3C0F18E053F361BF80D7BD126F67A5B7BE8241388802ABA430D751F60CD7D3
-              type: TEXT
-            total_processor_time:
-              description: The total amount of time that the processor has spent on
-                this thread
-              field_name: TotalProcessorTime
-              sample_value: 00:00:00
-              type: ''
-            user_processor_time:
-              description: The amount of time that the thread has spent running code
-                inside the application
-              field_name: UserProcessorTime
-              sample_value: 00:00:00
-              type: ''
-            wait_reason:
-              description: The reason that the thread is waiting
+            ? ''
+            : description: The reason that the thread is waiting
               field_name: WaitReason
               sample_value: Suspended
               type: TEXT
@@ -11459,19 +10896,9 @@ OSSEM:
       windowsdefenderatp:
         AlertEvents:
           data_dictionary:
-            alert_id:
-              description: Unique identifier for the alert
-              field_name: AlertId
-              sample_value: ''
-              type: string
-            category:
-              description: ''
-              field_name: Category
-              sample_value: ''
-              type: ''
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
+            ? ''
+            : description: Table that contains the details of the event
+              field_name: Table
               sample_value: ''
               type: string
             event_date_creation:
@@ -11479,55 +10906,12 @@ OSSEM:
               field_name: EventTime
               sample_value: ''
               type: date
-            file_name:
-              description: Name of the file that the recorded action was applied to
-              field_name: FileName
-              sample_value: ''
-              type: string
             hash_sha1:
               description: "\xDF  SHA-1 of the file that the recorded action was applied\
                 \ to"
               field_name: SHA1
               sample_value: ''
               type: string
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
-              sample_value: ''
-              type: string
-            remote_ip:
-              description: IP address that was being connected to
-              field_name: RemoteIP
-              sample_value: ''
-              type: string
-            remote_url:
-              description: URL or fully qualified domain name (FQDN) that was being
-                connected to
-              field_name: RemoteUrl
-              sample_value: ''
-              type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
-            severity:
-              description: ''
-              field_name: Severity
-              sample_value: ''
-              type: ''
-            table:
-              description: Table that contains the details of the event
-              field_name: Table
-              sample_value: ''
-              type: string
-            title:
-              description: ''
-              field_name: Title
-              sample_value: ''
-              type: ''
           description:
             text: Alerts on Windows Defender Security Center
           meta:
@@ -11539,22 +10923,11 @@ OSSEM:
           title: AlertEvents
         FileCreationEvents:
           data_dictionary:
-            action_type:
-              description: Type of activity that triggered the event
-              field_name: ActionType
+            ? ''
+            : description: ''
+              field_name: IsAzureInfoProtectionApplied
               sample_value: ''
-              type: string
-            app_guard_container_id:
-              description: Identifier for the virtualized container used by Application
-                Guard to isolate browser activity
-              field_name: AppGuardContainerId
-              sample_value: ''
-              type: string
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
-              sample_value: ''
-              type: string
+              type: ''
             event_date_creation:
               description: Date and time when the event was recorded
               field_name: EventTime
@@ -11563,21 +10936,6 @@ OSSEM:
             file_name:
               description: Name of the file that the recorded action was applied to
               field_name: FileName
-              sample_value: ''
-              type: string
-            file_origin_ip:
-              description: IP address where the file was downloaded from
-              field_name: FileOriginIP
-              sample_value: ''
-              type: string
-            file_origin_reference_url:
-              description: URL of the web page that links to the downloaded file
-              field_name: FileOriginReferenceUrl
-              sample_value: ''
-              type: string
-            file_origin_url:
-              description: URL where the file was downloaded from
-              field_name: FileOriginUrl
               sample_value: ''
               type: string
             file_path:
@@ -11602,21 +10960,6 @@ OSSEM:
               description: SHA-256 of the file that the recorded action was applied
                 to. This field is usually not populated-use the SHA1 column when available.
               field_name: SHA256
-              sample_value: ''
-              type: string
-            is_azure_info_protection_applied:
-              description: ''
-              field_name: IsAzureInfoProtectionApplied
-              sample_value: ''
-              type: ''
-            is_windows_infor_protection_applied:
-              description: ''
-              field_name: IsWindowsInfoProtectionApplied
-              sample_value: ''
-              type: ''
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
               sample_value: ''
               type: string
             md5_hash:
@@ -11686,23 +11029,6 @@ OSSEM:
               field_name: InitiatingProcessTokenElevation
               sample_value: ''
               type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
-            sensitivity_label:
-              description: ''
-              field_name: SensitivityLabel
-              sample_value: ''
-              type: ''
-            sensitivity_sublabel:
-              description: ''
-              field_name: SensitivitySubLabel
-              sample_value: ''
-              type: ''
             sha1_hash:
               description: SHA-1 of the process (image file) that initiated the event
               field_name: InitiatingProcessSHA1
@@ -11737,20 +11063,10 @@ OSSEM:
           title: FileCreationEvents
         ImageLoadEvents:
           data_dictionary:
-            action_type:
-              description: Type of activity that triggered the event
-              field_name: ActionType
-              sample_value: ''
-              type: string
-            app_guard_container_id:
-              description: Identifier for the virtualized container used by Application
+            ? ''
+            : description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
-              sample_value: ''
-              type: string
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -11779,11 +11095,6 @@ OSSEM:
               description: SHA-1 of the file that the recorded action was applied
                 to
               field_name: SHA1
-              sample_value: ''
-              type: string
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
               sample_value: ''
               type: string
             process_command_line:
@@ -11858,13 +11169,6 @@ OSSEM:
               field_name: InitiatingProcessTokenElevation
               sample_value: ''
               type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
             user_domain:
               description: Domain of the account that ran the process responsible
                 for the event
@@ -11894,25 +11198,10 @@ OSSEM:
           title: ImageLoadEvents
         LogonEvents:
           data_dictionary:
-            action_type:
-              description: Type of activity that triggered the event
-              field_name: ActionType
-              sample_value: ''
-              type: string
-            additional_fields:
-              description: Additional information about the event in JSON array format
-              field_name: AdditionalFields
-              sample_value: ''
-              type: string
-            app_guard_container_id:
-              description: Identifier for the virtualized container used by Application
+            ? ''
+            : description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
-              sample_value: ''
-              type: string
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
               sample_value: ''
               type: string
             dst_host_name:
@@ -11939,22 +11228,6 @@ OSSEM:
               field_name: EventTime
               sample_value: ''
               type: date
-            logon_id:
-              description: Identifier for a logon session. This identifier is unique
-                on the same machine only between restarts.
-              field_name: LogonId
-              sample_value: ''
-              type: string
-            logon_type:
-              description: Type of logon session
-              field_name: LogonType
-              sample_value: ''
-              type: string
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
-              sample_value: ''
-              type: string
             process_command_line:
               description: Command line used to run the process that initiated the
                 event
@@ -12045,19 +11318,6 @@ OSSEM:
               field_name: InitiatingProcessAccountSid
               sample_value: ''
               type: string
-            remote_ip_type:
-              description: Type of IP address, for example Public, Private, Reserved,
-                Loopback, Teredo, FourToSixMapping, and Broadcast
-              field_name: RemoteIPType
-              sample_value: ''
-              type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
             user_domain:
               description: Domain of the account
               field_name: AccountDomain
@@ -12084,80 +11344,16 @@ OSSEM:
           title: LogonEvents
         MachineInfo:
           data_dictionary:
-            client_version:
-              description: ''
-              field_name: ClientVersion
+            ? ''
+            : description: ''
+              field_name: OSVersion
               sample_value: ''
               type: ''
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
-              sample_value: ''
-              type: string
             event_date_creation:
               description: Date and time when the event was recorded
               field_name: EventTime
               sample_value: ''
               type: date
-            is_azure_ad_joined:
-              description: Boolean indicator of whether machine is joined to the Azure
-                Active Directory
-              field_name: ISAzureADJoined
-              sample_value: ''
-              type: boolean
-            logged_on_users:
-              description: List of all users that are logged on the machine at the
-                time of the event in JSON array format
-              field_name: LoggedOnUsers
-              sample_value: ''
-              type: string
-            machine_group:
-              description: Machine group of the machine. This group is used by role-based
-                access control to determine access to the machine.
-              field_name: MachineGroup
-              sample_value: ''
-              type: string
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
-              sample_value: ''
-              type: string
-            os_architecture:
-              description: Architecture of the operating system running on the machine
-              field_name: OSArchitecture
-              sample_value: ''
-              type: string
-            os_build:
-              description: Build version of the operating system running on the machine
-              field_name: OSBuild
-              sample_value: ''
-              type: string
-            os_platform:
-              description: Platform of the operating system running on the machine.
-                This indicates specific operating systems, including variations within
-                the same family, such as Windows 10 and Windows 7.
-              field_name: OSPlatform
-              sample_value: ''
-              type: string
-            os_version:
-              description: ''
-              field_name: OSVersion
-              sample_value: ''
-              type: ''
-            public_ip:
-              description: Public IP address used by the onboarded machine to connect
-                to the Windows Defender ATP service. This could be the IP address
-                of the machine itself, a NAT device, or a proxy.
-              field_name: PublicIP
-              sample_value: ''
-              type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
           description:
             text: Machine information, including OS information
           meta:
@@ -12169,27 +11365,11 @@ OSSEM:
           title: MachineInfo
         MachineNetworkInfo:
           data_dictionary:
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
-              sample_value: ''
-              type: string
-            connected_network:
-              description: Networks that the adapter is connected to. Each JSON array
-                contains the network name, category (public, private or domain), a
-                description, and a flag indicating if it's connected publicly to the
-                internet.
-              field_name: ConnectedNetwork
-              sample_value: ''
-              type: string
-            default_gateways:
-              description: Default gateway addresses in JSON array format
-              field_name: DefaultGateways
-              sample_value: ''
-              type: string
-            dns_address:
-              description: DNS server addresses in JSON array format
-              field_name: DnsAddress
+            ? ''
+            : description: JSON array containing all the IP addresses assigned to
+                the adapter, along with their respective subnet prefix and IP address
+                space, such as public, private, or link-local
+              field_name: IPAddresses
               sample_value: ''
               type: string
             event_date_creation:
@@ -12197,61 +11377,6 @@ OSSEM:
               field_name: EventTime
               sample_value: ''
               type: date
-            ip_address:
-              description: JSON array containing all the IP addresses assigned to
-                the adapter, along with their respective subnet prefix and IP address
-                space, such as public, private, or link-local
-              field_name: IPAddresses
-              sample_value: ''
-              type: string
-            ipv4_dhcp:
-              description: IPv4 address of DHCP server
-              field_name: IPv4Dhcp
-              sample_value: ''
-              type: string
-            ipv6_dhcp:
-              description: IPv6 address of DHCP server
-              field_name: IPv6Dhcp
-              sample_value: ''
-              type: string
-            mac_address:
-              description: string
-              field_name: MacAddress
-              sample_value: MAC address of the network adapter
-              type: ''
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
-              sample_value: ''
-              type: string
-            network_adapter_name:
-              description: Name of the network adapter
-              field_name: NetworkAdapterName
-              sample_value: ''
-              type: string
-            network_adapter_status:
-              description: Operational status of the network adapter
-              field_name: NetworkAdapterStatus
-              sample_value: ''
-              type: string
-            network_adapter_type:
-              description: Network adapter type
-              field_name: NetworkAdapterType
-              sample_value: ''
-              type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
-            tunnel_type:
-              description: Tunneling protocol, if the interface is used for this purpose,
-                for example 6to4, Teredo, ISATAP, PPTP, SSTP, and SSH
-              field_name: TunnelType
-              sample_value: ''
-              type: string
           description:
             text: Network properties of machines, including adapters, IP and MAC addresses,
               as well as connected networks and domains
@@ -12265,25 +11390,10 @@ OSSEM:
           title: MachineNetworkInfo
         MiscEvents:
           data_dictionary:
-            action_type:
-              description: Type of activity that triggered the event
-              field_name: ActionType
-              sample_value: ''
-              type: string
-            additional_fields:
-              description: Additional information about the event in JSON array format
-              field_name: AdditionalFields
-              sample_value: ''
-              type: string
-            app_guard_container_id:
-              description: Identifier for the virtualized container used by Application
+            ? ''
+            : description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
-              sample_value: ''
-              type: string
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -12291,27 +11401,6 @@ OSSEM:
               field_name: EventTime
               sample_value: ''
               type: date
-            file_name:
-              description: Name of the file that the recorded action was applied to
-              field_name: FileName
-              sample_value: ''
-              type: string
-            file_origin_ip:
-              description: IP address where the file was downloaded from
-              field_name: FileOriginIP
-              sample_value: ''
-              type: string
-            file_origin_url:
-              description: URL where the file was downloaded from
-              field_name: FileOriginUrl
-              sample_value: ''
-              type: string
-            folder_path:
-              description: Folder containing the file that the recorded action was
-                applied to
-              field_name: FolderPath
-              sample_value: ''
-              type: string
             hash_md5:
               description: MD5 hash of the file that the recorded action was applied
                 to
@@ -12324,186 +11413,16 @@ OSSEM:
               field_name: SHA1
               sample_value: ''
               type: string
-            iniating_process_sha1:
-              description: SHA-1 of the process (image file) that initiated the event
-              field_name: InitiatingProcessSHA1
-              sample_value: ''
-              type: string
-            iniating_process_sha256:
-              description: SHA-256 of the process (image file) that initiated the
-                event. This field is usually not populated-use the SHA1 column when
-                available.
-              field_name: InitiatingProcessSHA256
-              sample_value: ''
-              type: string
-            initiating_process_account_domain:
-              description: Domain of the account that ran the process responsible
-                for the event
-              field_name: InitiatingProcessAccountDomain
-              sample_value: ''
-              type: string
-            initiating_process_account_name:
-              description: User name of the account that ran the process responsible
-                for the event
-              field_name: InitiatingProcessAccountName
-              sample_value: ''
-              type: string
-            initiating_process_account_sid:
-              description: Security Identifier (SID) of the account that ran the process
-                responsible for the event
-              field_name: InitiatingProcessAccountSid
-              sample_value: ''
-              type: string
-            initiating_process_command_line:
-              description: Command line used to run the process that initiated the
-                event
-              field_name: InitiatingProcessCommandLine
-              sample_value: ''
-              type: string
-            initiating_process_creation_time:
-              description: Date and time when the process that initiated the event
-                was started
-              field_name: InitiatingProcessCreationTime
-              sample_value: ''
-              type: date
-            initiating_process_file_name:
-              description: Name of the process that initiated the event
-              field_name: InitiatingProcessFileName
-              sample_value: ''
-              type: string
-            initiating_process_folder_path:
-              description: Folder containing the process (image file) that initiated
-                the event
-              field_name: InitiatingProcessFolderPath
-              sample_value: ''
-              type: string
-            initiating_process_id:
-              description: Process ID (PID) of the process that initiated the event
-              field_name: InitiatingProcessId
-              sample_value: ''
-              type: int
-            initiating_process_logon_id:
-              description: Identifier for a logon session of the process that initiated
-                the event. This identifier is unique on the same machine only between
-                restarts.
-              field_name: InitiatingProcessLogonId
-              sample_value: ''
-              type: string
-            initiating_process_md5:
-              description: MD5 hash of the process (image file) that initiated the
-                event
-              field_name: InitiatingProcessMD5
-              sample_value: ''
-              type: string
-            initiating_process_parent_creation_time:
-              description: Date and time when the parent of the process responsible
-                for the event was started
-              field_name: InitiatingProcessParentCreationTime
-              sample_value: ''
-              type: date
-            initiating_process_parent_file_name:
-              description: Name of the parent process that spawned the process responsible
-                for the event
-              field_name: InitiatingProcessParentFileName
-              sample_value: ''
-              type: string
-            initiating_process_parent_id:
-              description: Process ID (PID) of the parent process that spawned the
-                process responsible for the event
-              field_name: InitiatingProcessParentId
-              sample_value: ''
-              type: int
-            local_ip:
-              description: IP address assigned to the local machine used during communication
-              field_name: LocalIP
-              sample_value: ''
-              type: string
-            local_port:
-              description: TCP port on the local machine used during communication
-              field_name: LocalPort
-              sample_value: ''
-              type: int
-            logon_id:
-              description: Identifier for a logon session. This identifier is unique
-                on the same machine only between restarts.
-              field_name: LogonId
-              sample_value: ''
-              type: string
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
-              sample_value: ''
-              type: string
             process_command_line:
               description: Command line used to create the new process
               field_name: ProcessCommandLine
               sample_value: ''
               type: string
-            process_creation_time:
-              description: Date and time the process was created
-              field_name: ProcessCreationTime
-              sample_value: ''
-              type: date
             process_id:
               description: Process ID (PID) of the newly created process
               field_name: ProcessId
               sample_value: ''
               type: int
-            process_token_elevation:
-              description: Token type indicating the presence or absence of User Access
-                Control (UAC) privilege elevation applied to the newly created process
-              field_name: ProcessTokenElevation
-              sample_value: ''
-              type: string
-            registry_key:
-              description: Registry key that the recorded action was applied to
-              field_name: RegistryKey
-              sample_value: ''
-              type: string
-            registry_value_data:
-              description: Data of the registry value that the recorded action was
-                applied to
-              field_name: RegistryValueData
-              sample_value: ''
-              type: string
-            registry_value_name:
-              description: Name of the registry value that the recorded action was
-                applied to
-              field_name: RegistryValueName
-              sample_value: ''
-              type: string
-            remote_computer_name:
-              description: Name of the machine that performed a remote operation on
-                the affected machine. Depending on the event being reported, this
-                name could be a fully-qualified domain name (FQDN), a NetBIOS name,
-                or a host name without domain information.
-              field_name: RemoteComputerName
-              sample_value: ''
-              type: string
-            remote_ip:
-              description: IP address that was being connected to
-              field_name: RemoteIP
-              sample_value: ''
-              type: string
-            remote_port:
-              description: TCP port on the remote device that was being connected
-                to
-              field_name: RemotePort
-              sample_value: ''
-              type: int
-            remote_url:
-              description: URL or fully qualified domain name (FQDN) that was being
-                connected to
-              field_name: RemoteUrl
-              sample_value: ''
-              type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
             user_domain:
               description: Domain of the account
               field_name: AccountDomain
@@ -12532,20 +11451,10 @@ OSSEM:
           title: MiscEvents
         NetworkCommunicationEvents:
           data_dictionary:
-            action_type:
-              description: Type of activity that triggered the event
-              field_name: ActionType
-              sample_value: ''
-              type: string
-            app_guard_container_id:
-              description: Identifier for the virtualized container used by Application
+            ? ''
+            : description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
-              sample_value: ''
-              type: string
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
               sample_value: ''
               type: string
             dst_host_name:
@@ -12585,11 +11494,6 @@ OSSEM:
             hash_sha1:
               description: SHA-1 of the process (image file) that initiated the event
               field_name: InitiatingProcessSHA1
-              sample_value: ''
-              type: string
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
               sample_value: ''
               type: string
             network_protocol:
@@ -12658,13 +11562,6 @@ OSSEM:
               field_name: InitiatingProcessTokenElevation
               sample_value: ''
               type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
             src_ip:
               description: IP address assigned to the local machine used during communication
               field_name: LocalIP
@@ -12710,20 +11607,10 @@ OSSEM:
           title: NetworkCommunicationEvents
         ProcessCreationEvents:
           data_dictionary:
-            action_type:
-              description: Type of activity that triggered the event
-              field_name: ActionType
-              sample_value: ''
-              type: string
-            app_guard_container_id:
-              description: Identifier for the virtualized container used by Application
+            ? ''
+            : description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
-              sample_value: ''
-              type: string
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -12747,29 +11634,6 @@ OSSEM:
               description: SHA-256 of the file that the recorded action was applied
                 to. This field is usually not populated-use the SHA1 column when available.
               field_name: SHA256
-              sample_value: ''
-              type: string
-            initiating_process_parent_creation_time:
-              description: Date and time when the parent of the process responsible
-                for the event was started
-              field_name: InitiatingProcessParentCreationTime
-              sample_value: ''
-              type: date
-            initiating_process_parent_file_name:
-              description: Name of the parent process that spawned the process responsible
-                for the event
-              field_name: InitiatingProcessParentFileName
-              sample_value: ''
-              type: string
-            initiating_process_parent_id:
-              description: Process ID (PID) of the parent process that spawned the
-                process responsible for the event
-              field_name: InitiatingProcessParentId
-              sample_value: ''
-              type: int
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
               sample_value: ''
               type: string
             process_command_line:
@@ -12898,13 +11762,6 @@ OSSEM:
               field_name: ProcessTokenElevation
               sample_value: ''
               type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
             user_domain:
               description: Domain of the account
               field_name: AccountDomain
@@ -12938,20 +11795,10 @@ OSSEM:
         README: null
         RegistryEvents:
           data_dictionary:
-            action_type:
-              description: Type of activity that triggered the event
-              field_name: ActionType
-              sample_value: ''
-              type: string
-            app_guard_container_id:
-              description: Identifier for the virtualized container used by Application
+            ? ''
+            : description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
-              sample_value: ''
-              type: string
-            computer_name:
-              description: Fully qualified domain name (FQDN) of the machine
-              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -12968,21 +11815,6 @@ OSSEM:
             hash_sha1:
               description: SHA-1 of the process (image file) that initiated the event
               field_name: InitiatingProcessSHA1
-              sample_value: ''
-              type: string
-            machine_id:
-              description: Unique identifier for the machine in the service
-              field_name: MachineId
-              sample_value: ''
-              type: string
-            previous_registry_value_data:
-              description: Original data of the registry value before it was modified
-              field_name: PreviousRegistryValueData
-              sample_value: ''
-              type: string
-            previous_registry_value_name:
-              description: Original name of the registry value before it was modified
-              field_name: PreviousRegistryValueName
               sample_value: ''
               type: string
             process_command_line:
@@ -13051,31 +11883,6 @@ OSSEM:
               field_name: RegistryKey
               sample_value: ''
               type: string
-            registry_value_data:
-              description: Data of the registry value that the recorded action was
-                applied to
-              field_name: RegistryValueData
-              sample_value: ''
-              type: string
-            registry_value_name:
-              description: Name of the registry value that the recorded action was
-                applied to
-              field_name: RegistryValueName
-              sample_value: ''
-              type: string
-            registry_value_type:
-              description: Data type, such as binary or string, of the registry value
-                that the recorded action was applied to
-              field_name: RegistryValueType
-              sample_value: ''
-              type: string
-            report_id:
-              description: Event identifier based on a repeating counter. To identify
-                unique events, this column must be used in conjunction with the ComputerName
-                and EventTime columns.
-              field_name: ReportId
-              sample_value: ''
-              type: long
             user_domain:
               description: Domain of the account that ran the process responsible
                 for the event

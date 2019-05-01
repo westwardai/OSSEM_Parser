@@ -30,7 +30,7 @@ def convert_unicode_quotes_dashes(text):
             .replace(u'\u201D', '"').replace(u'\u200B', '').replace(u'\u2026', '...')
 
 def lower_under_joined(text):
-    """ silly method to convert dictionary keys to a more 'pythonic' representation"""
+    """ silly function to convert dictionary keys to a more 'pythonic' representation"""
     return '_'.join(list(map(lambda w: w.lower(), text.split(' ')))) # this will convert something like 'Blase Blah' to 'blase_blah'
 
 class DictRenderer(mistune.Renderer):
@@ -44,6 +44,7 @@ class DictRenderer(mistune.Renderer):
         self.table_headers = []
         self.current_table_entry = {}
         self.current_table_entry_index = 0
+        self.table_count = 0
     def get_python_dict(self):
         """ this method can be called to extract the dictionary at the end of the parsing phase """
         return self.object_data
@@ -81,9 +82,18 @@ class DictRenderer(mistune.Renderer):
             print("paragraph: {}".format(text))
         return text
     def table(self, header, body):
-        """ handler that gets called when mistune hits a table in markdown """
+        """ handler that gets called when mistune hits a table in markdown.
+            Note this actually gets called when the table is finished being processed """
         if VERBOSE:
             print("table header: {} table body: {}".format(header, body))
+        self.table_headers_done = False
+        self.table_headers = []
+        self.current_table_index = 0
+        if self.table_count == 0:
+          self.current_table_entry = {}
+        else:
+          self.current_table_entry = []
+        self.table_count += 1
         return body
     def double_emphasis(self, text):
         """ handler that gets called when mistune his double_emphasis in markdown """
@@ -163,20 +173,26 @@ class DictRenderer(mistune.Renderer):
         if not self.table_headers_done:
             self.table_headers.append(lower_under_joined(content))
         else:
-            self.current_table_entry[self.table_headers[self.current_table_entry_index]] = convert_unicode_quotes_dashes(content)
+            content = convert_unicode_quotes_dashes(content)
+            if self.table_count > 0 and ('http' in content or '..' in content):
+              self.current_table_entry[self.table_headers[self.current_table_entry_index]] = self.current_link
+            else:
+              self.current_table_entry[self.table_headers[self.current_table_entry_index]] = convert_unicode_quotes_dashes(content)
             if VERBOSE:
                 print("current_table_entry: {} current_table_entry_index: {}".format(self.current_table_entry, self.current_table_entry_index))
             self.current_table_entry_index += 1
             if self.current_table_entry_index >= self.entry_length:
-                #standard_name = self.current_table_entry['standard_name']
-                first_table_column_value = self.current_table_entry[self.table_headers[0]]
-                if 'type' in self.current_table_entry and self.current_table_entry['type'].lower() == 'integer':
-                    try:
-                        self.current_table_entry['sample_value'] = int(self.current_table_entry['sample_value'], 0)
-                    except Exception as e:
-                        self.current_table_entry['sample_value'] = None
-                del self.current_table_entry[self.first_table_column_name]
-                self.object_data[self.fields_key][first_table_column_value] = self.current_table_entry
+                if self.table_count == 0:
+                    first_table_column_value = self.current_table_entry[self.table_headers[0]]
+                    if 'type' in self.current_table_entry and self.current_table_entry['type'].lower() == 'integer':
+                        try:
+                            self.current_table_entry['sample_value'] = int(self.current_table_entry['sample_value'], 0)
+                        except Exception as e:
+                            self.current_table_entry['sample_value'] = None
+                    del self.current_table_entry[self.first_table_column_name]
+                    self.object_data[self.fields_key][first_table_column_value] = self.current_table_entry
+                else:
+                    self.object_data[self.fields_key].append(self.current_table_entry)
                 self.current_table_entry = {}
                 self.current_table_entry_index = 0
         return content
@@ -185,6 +201,7 @@ class CIMDictRenderer(DictRenderer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.description_next = False
+        self.current_link = None
     def header(self, text, level, raw=None):
         if VERBOSE:
             print("header: {} level: {}".format(text, level))
@@ -194,7 +211,10 @@ class CIMDictRenderer(DictRenderer):
         if level == 2 and text not in self.object_data:
             text = lower_under_joined(text)
             self.fields_key = lower_under_joined(text)
-            self.object_data[self.fields_key] = {}
+            if self.table_count == 0:
+                self.object_data[self.fields_key] = {}
+            else:
+                self.object_data[self.fields_key] = []
         return text
     def text(self, text):
         if self.description_next == True:
@@ -203,6 +223,10 @@ class CIMDictRenderer(DictRenderer):
         if VERBOSE:
             print("text: {}".format(text))
         return text
+    def link(self, link, title, text):
+        if VERBOSE:
+            print("link: {} title: {} text: {}".format(link, title, text))
+        self.current_link = {'link': link, 'text': text}
 
 class DataDictionaryDictRenderer(DictRenderer):
     def __init__(self, **kwargs):
@@ -271,7 +295,7 @@ class DataDictionaryDictRenderer(DictRenderer):
         if VERBOSE:
             print("link: {} title: {} text: {}".format(link, title, text))
         if not self.description_done:
-            if  'links' not in self.object_data['description']:
+            if 'links' not in self.object_data['description']:
                 self.object_data['description']['links'] = []
             self.object_data['description']['links'].append({'link': link, 'text': text})
     def inline_html(self, html):
@@ -456,7 +480,7 @@ if __name__ == '__main__':
     else:
         import unittest
         from tests.test_cim import TestOSSEMCIM
-        #from tests.test_data_dictionaries import TestOSSEMDataDictionaries
-        #from tests.test_attack_data_sources import TestOSSEMADS
+        from tests.test_data_dictionaries import TestOSSEMDataDictionaries
+        from tests.test_attack_data_sources import TestOSSEMADS
         #from tests.test_detection_data_model import TestDetectionDataModels # didn't finish the tests
         unittest.main()
