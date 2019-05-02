@@ -445,22 +445,22 @@ OSSEM:
       name: Host Schema
     ip:
       data_fields:
-        'True':
-          description: string
-          sample_value: IP Protocol type for the connection (TCP/UDP/ICMP etc)
-          type: ip_proto
         dst_ip:
           description: destination IP in a network connection (IPv4)
           sample_value: 8.8.8.8
           type: ip
-        initiated:
-          description: session
-          sample_value: Flag to state the session was initiated or received
-          type: boolean
         ip_address:
           description: IP address of the endpoint where the log was created
           sample_value: 8.8.8.8
           type: ip
+        ip_proto:
+          description: IP Protocol type for the connection (TCP/UDP/ICMP etc)
+          sample_value: TCP
+          type: string
+        session_initiated:
+          description: Flag to state the session was initiated or received
+          sample_value: 'True'
+          type: boolean
         src_ip:
           description: source IP in a network connection (IPV4)
           sample_value: 192.168.1.2
@@ -1138,11 +1138,6 @@ OSSEM:
       osquery:
         file:
           data_dictionary:
-            dale_last_modification:
-              description: Last modification time
-              field_name: mtime
-              sample_value: ''
-              type: BIGINT
             date_creation_time:
               description: (B)irth or (cr)eate time
               field_name: btime
@@ -1151,6 +1146,11 @@ OSSEM:
             date_last_access:
               description: Last access time
               field_name: atime
+              sample_value: ''
+              type: BIGINT
+            date_last_modification:
+              description: Last modification time
+              field_name: mtime
               sample_value: ''
               type: BIGINT
             date_last_status_change:
@@ -1236,11 +1236,6 @@ OSSEM:
       osquery:
         file:
           data_dictionary:
-            dale_last_modification:
-              description: Last modification time
-              field_name: mtime
-              sample_value: ''
-              type: BIGINT
             date_creation_time:
               description: (B)irth or (cr)eate time
               field_name: btime
@@ -1249,6 +1244,11 @@ OSSEM:
             date_last_access:
               description: Last access time
               field_name: atime
+              sample_value: ''
+              type: BIGINT
+            date_last_modification:
+              description: Last modification time
+              field_name: mtime
               sample_value: ''
               type: BIGINT
             date_last_status_change:
@@ -1332,18 +1332,18 @@ OSSEM:
         README: null
         childproc:
           data_dictionary:
-            ? ''
-            : description: Specifies whether this process_guid is the child or the
-                parent
-              field_name: created
-              sample_value: 'true'
-              type: BOOLEAN
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
               field_name: cb_server
               sample_value: cbserver
               type: TEXT
+            created:
+              description: Specifies whether this process_guid is the child or the
+                parent
+              field_name: created
+              sample_value: 'true'
+              type: BOOLEAN
             event_date_creation:
               description: Endpoint timestamp of this event since epoch
               field_name: timestamp
@@ -1425,17 +1425,17 @@ OSSEM:
           title: ingress.event.childproc (Child Process)
         crossprocopen:
           data_dictionary:
-            ? ''
-            : description: Target Process create time represented as a 64-bit Windows
-                FILETIME
-              field_name: target_create_time
-              sample_value: '130921702131467731'
-              type: BIGINT
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
               field_name: cb_server
               sample_value: cbserver
+              type: TEXT
+            cross_process_type:
+              description: 'The type of cross process event: either open_process (opening
+                a handle to another process) or open_thread'
+              field_name: cross_process_type
+              sample_value: open_process
               type: TEXT
             event_date_creation:
               description: Endpoint timestamp of this event since epoch
@@ -1462,6 +1462,12 @@ OSSEM:
               field_name: computer_name
               sample_value: JASON-WIN81-VM
               type: TEXT
+            is_target:
+              description: specifies whether process_guid is the target of the cross
+                process event
+              field_name: is_target
+              sample_value: 'false'
+              type: BOOLEAN
             process_granted_access:
               description: Windows bitfield representing the requested access for
                 this process or thread handle (decimal)
@@ -1494,6 +1500,12 @@ OSSEM:
               field_name: link_sensor
               sample_value: https://cbtests/#/host/7
               type: TEXT
+            target_create_time:
+              description: Target Process create time represented as a 64-bit Windows
+                FILETIME
+              field_name: target_create_time
+              sample_value: '130921702131467731'
+              type: BIGINT
             target_process_guid:
               description: process_guid of the target process
               field_name: target_process_guid
@@ -1543,20 +1555,24 @@ OSSEM:
           title: ingress.event.crossprocopen (Cross Process Open)
         emetmitigation:
           data_dictionary:
-            ? ''
-            : description: The type of EMET mitigation performed to block the operation.
-                Possible values are Dep, Sehop, Asr, Aslr, NullPage, HeapSpray, MandatoryAslr,
-                Eaf, EafPlus, BottomUpAslr, LoadLibrary, MemoryProtection, SimulateExecFlow,
-                StackPivot, CallerChecks, BannedFunctions, DeepHooks, AntiDetours.
-              field_name: mitigation
-              sample_value: Eaf
-              type: TEXT
+            blocked:
+              description: boolean value describing if the action was successfully
+                blocked by EMET
+              field_name: blocked
+              sample_value: 'true'
+              type: BOOLEAN
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
               field_name: cb_server
               sample_value: cbserver
               type: TEXT
+            emet_timestamp:
+              description: timestamp of EMET event represented by a 64-bit Windows
+                FILETIME
+              field_name: emet_timestamp
+              sample_value: '130949318600000000'
+              type: BIGINT
             event_date_creation:
               description: Endpoint timestamp of this event since epoch
               field_name: timestamp
@@ -1581,6 +1597,28 @@ OSSEM:
               description: hostname of the sensor
               field_name: computer_name
               sample_value: JASON-WIN81-VM
+              type: TEXT
+            log_id:
+              description: EMET log ID associated with this emetmitigation event
+              field_name: log_id
+              sample_value: 1032
+              type: INTEGER
+            log_message:
+              description: The full log message generated by EMET
+              field_name: log_message
+              sample_value: 'EMET detected EAF mitigation and will close the application:
+                EMET_Test64.exe\r\n\r\nEAF check failed:\n  Application \t: C:\Users\dan\Desktop\EMET_TEST\EMET_Test64.exe\n  User
+                Name \t: DANWIN764\dan\n  Session ID \t: 1\n  PID \t\t: 0xD10 (3344)\n  TID
+                \t\t: 0xDB4 (3508)\n  Module \t: N/A\n  Mod Base \t: 0x0000000000000000\n  Mod
+                Address \t: 0x000000000297000D\n  Mem Address \t: 0x0000000000000000\n\r\n'
+              type: TEXT
+            mitigation:
+              description: The type of EMET mitigation performed to block the operation.
+                Possible values are Dep, Sehop, Asr, Aslr, NullPage, HeapSpray, MandatoryAslr,
+                Eaf, EafPlus, BottomUpAslr, LoadLibrary, MemoryProtection, SimulateExecFlow,
+                StackPivot, CallerChecks, BannedFunctions, DeepHooks, AntiDetours.
+              field_name: mitigation
+              sample_value: Eaf
               type: TEXT
             process_guid:
               description: Process GUID of offending process
@@ -1635,13 +1673,17 @@ OSSEM:
           title: ingress.event.emetmitigation (EMET Mitigation)
         filemod:
           data_dictionary:
-            ? ''
-            : description: 'The detected file type of this file. Only valid for "lastwrite"
-                actions. Currently supported file types: PE, ELF, UniversalBin, Eicar,
-                OfficeLegacy, OfficeOpenXml, PDF, PKZIP, LZH, LZW, RAR, TAR, and 7zip.'
-              field_name: filetype_name
-              sample_value: Unknown
+            action:
+              description: 'Type of file modification: create, write, delete, lastwrite'
+              field_name: action
+              sample_value: create
               type: TEXT
+            actiontype:
+              description: 'Enum value of the file modification: 1=create, 2=write,
+                4=delete, 8=lastwrite'
+              field_name: actiontype
+              sample_value: 1
+              type: INTEGER
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
@@ -1667,6 +1709,20 @@ OSSEM:
               description: Full file path
               field_name: path
               sample_value: c:\users\admin\appdata\local\google\chrome\user data\b5e2.tmp
+              type: TEXT
+            filetype:
+              description: Enum value of the detected file type of this file. Only
+                valid for "lastwrite" actions. See the CbFileType protobuf definition
+                for the available values.
+              field_name: filetype
+              sample_value: 0
+              type: INTEGER
+            filetype_name:
+              description: 'The detected file type of this file. Only valid for "lastwrite"
+                actions. Currently supported file types: PE, ELF, UniversalBin, Eicar,
+                OfficeLegacy, OfficeOpenXml, PDF, PKZIP, LZH, LZW, RAR, TAR, and 7zip.'
+              field_name: filetype_name
+              sample_value: Unknown
               type: TEXT
             hash:
               description: md5 of process executable
@@ -1805,18 +1861,21 @@ OSSEM:
           title: ingress.event.moduleload (Module Load)
         netconn:
           data_dictionary:
-            ? ''
-            : description: remote ipv4 address of network connection. Maintained for
-                backward compatibility for earlier versions of the event forwarder.
-                See local_ip and remote_ip.
-              field_name: ipv4
-              sample_value: 23.4.187.27
-              type: TEXT
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
               field_name: cb_server
               sample_value: cbserver
+              type: TEXT
+            direction:
+              description: 'Direction of the netconn event: inbound or outbound'
+              field_name: direction
+              sample_value: outbound
+              type: TEXT
+            domain:
+              description: The DNS name of the network peer, if available.
+              field_name: domain
+              sample_value: carbonblack.com
               type: TEXT
             dst_ip:
               description: IP address of the remote system (peer)
@@ -1852,6 +1911,13 @@ OSSEM:
               description: hostname of the sensor
               field_name: computer_name
               sample_value: WIN-OTEMNUTBS23
+              type: TEXT
+            ipv4:
+              description: remote ipv4 address of network connection. Maintained for
+                backward compatibility for earlier versions of the event forwarder.
+                See local_ip and remote_ip.
+              field_name: ipv4
+              sample_value: 23.4.187.27
               type: TEXT
             network_protocol:
               description: 6=TCP, 17=UDP
@@ -1915,8 +1981,22 @@ OSSEM:
           title: ingress.event.netconn (Network Connection)
         processblock:
           data_dictionary:
-            ? ''
-            : description: 'The result of the blocked action: ProcessTerminated, NotTerminatedCBProcess,
+            blocked_event:
+              description: 'The type of event that was blocked: either ProcessCreate
+                (the process was terminated immediately upon execution) or RunningProcess
+                (the process was already running on the endpoint when the block was
+                applied).'
+              field_name: blocked_event
+              sample_value: ProcessCreate
+              type: TEXT
+            blocked_reason:
+              description: The reason for block action (Md5Hash is the only possible
+                value)
+              field_name: blocked_reason
+              sample_value: Md5Hash
+              type: TEXT
+            blocked_result:
+              description: 'The result of the blocked action: ProcessTerminated, NotTerminatedCBProcess,
                 NotTerminatedSystemProcess, NotTerminatedCriticalSystemProcess, NotTerminatedWhitelistPath,
                 NotTerminatedOpenProcessError, or NotTerminatedTerminateError.'
               field_name: blocked_result
@@ -2000,12 +2080,6 @@ OSSEM:
           title: ingress.event.processblock (Process Block)
         procstart:
           data_dictionary:
-            ? ''
-            : description: If the md5 could not be calculated in time then Cb Response
-                will send another procstart with the process md5
-              field_name: expect_followon_w_md5
-              sample_value: 'false'
-              type: BOOLEAN
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
@@ -2027,6 +2101,12 @@ OSSEM:
               field_name: type
               sample_value: ingress.event.procstart
               type: TEXT
+            expect_followon_w_md5:
+              description: If the md5 could not be calculated in time then Cb Response
+                will send another procstart with the process md5
+              field_name: expect_followon_w_md5
+              sample_value: 'false'
+              type: BOOLEAN
             file_path:
               description: file path of the child processes' executable image
               field_name: path
@@ -2136,8 +2216,14 @@ OSSEM:
           title: ingress.event.procstart (Process Start)
         regmod:
           data_dictionary:
-            ? ''
-            : description: 'Enum value of the registry modification: 1=createkey,
+            action:
+              description: 'Type of registry modification. This can be one of: createkey,
+                writeval, delkey, or delval'
+              field_name: action
+              sample_value: writeval
+              type: TEXT
+            actiontype:
+              description: 'Enum value of the registry modification: 1=createkey,
                 2=writeval, 4=delkey, 8=delval'
               field_name: actiontype
               sample_value: 2
@@ -2224,12 +2310,6 @@ OSSEM:
           title: ingress.event.regmod (Registry Modification)
         tamper:
           data_dictionary:
-            ? ''
-            : description: 'The activity which triggered this tamper event: CoreDriverUnloaded,
-                NetworkDriverUnloaded, CbServiceStopped, CbProcessTerminated, or CbCodeInjection'
-              field_name: tamper_type
-              sample_value: CbProcessTerminated
-              type: TEXT
             cb_server:
               description: Used to distinguish between multiple Cb Response servers.
                 Set this in the "server_name" option of cb-event-forwarder.ini.
@@ -2261,6 +2341,12 @@ OSSEM:
               field_name: sensor_id
               sample_value: 1
               type: INTEGER
+            tamper_type:
+              description: 'The activity which triggered this tamper event: CoreDriverUnloaded,
+                NetworkDriverUnloaded, CbServiceStopped, CbProcessTerminated, or CbCodeInjection'
+              field_name: tamper_type
+              sample_value: CbProcessTerminated
+              type: TEXT
           description:
             links:
             - link: https://developer.carbonblack.com/reference/enterprise-response/event-forwarder/event-schema/#ingress-event-tamper-cb-response-tamper
@@ -3541,44 +3627,49 @@ OSSEM:
             title: 'Event ID 4625: An account failed to log on'
           '4626':
             data_dictionary:
-              EventCountTotal:
-                description: '1'
-                field_name: integer
-                sample_value: logon_user_claims
-                type: The name of the authentication package which was used for the
-                  logon authentication process. Default packages loaded on LSA startup
-                  are located in "HKLM\SYSTEM\CurrentControlSet\Control\Lsa\OSConfig"
+              event_count_total:
+                description: The name of the authentication package which was used
+                  for the logon authentication process. Default packages loaded on
+                  LSA startup are located in "HKLM\SYSTEM\CurrentControlSet\Control\Lsa\OSConfig"
                   registry key.
-              EventIdx:
-                description: '1'
-                field_name: integer
-                sample_value: event_count_total
-                type: If is there is not enough space in one event to put all claims,
-                  you will see "1 of N" in this field and additional events will be
-                  generated. Typically this field has "1 of 1" value.
-              LogonType:
-                description: '3'
-                field_name: integer
-                sample_value: event_sequence_id
-                type: the type of logon which was performed.
-              UserClaims:
-                description: 'ad://ext/cn:88d2b96fdb2b4c49 <%%1818> : "dadmin" ad://ext/Department:88d16a8edaa8c66b
+                field_name: EventCountTotal
+                sample_value: 1
+                type: integer
+              event_sequence_id:
+                description: If is there is not enough space in one event to put all
+                  claims, you will see "1 of N" in this field and additional events
+                  will be generated. Typically this field has "1 of 1" value.
+                field_name: EventIdx
+                sample_value: 1
+                type: integer
+              logon_device_claims:
+                description: list of device claims for new logon session
+                field_name: DeviceClaims
+                sample_value: '-'
+                type: string
+              logon_type:
+                description: the type of logon which was performed.
+                field_name: LogonType
+                sample_value: 3
+                type: integer
+              logon_user_claims:
+                description: list of user claims for new logon session. This field
+                  contains user claims if user account was logged in and device claims
+                  if computer account was logged in
+                field_name: UserClaims
+                sample_value: 'ad://ext/cn:88d2b96fdb2b4c49 <%%1818> : "dadmin" ad://ext/Department:88d16a8edaa8c66b
                   <%%1818> : "IT"'
-                field_name: string
-                sample_value: logon_device_claims
-                type: list of user claims for new logon session. This field contains
-                  user claims if user account was logged in and device claims if computer
-                  account was logged in
+                type: string
               user_domain:
                 description: subject's domain or computer name.
                 field_name: TargetDomainName
                 sample_value: CONTOSO
                 type: string
               user_logon_id:
-                description: 'hexadecimal value that can help you correlate this event
-                  with recent events that might contain the same Logon ID        0x136f7b    '
+                description: hexadecimal value that can help you correlate this event
+                  with recent events that might contain the same Logon ID
                 field_name: TargetLogonId
-                sample_value: null
+                sample_value: 1273723
                 type: integer
               user_name:
                 description: the name of the account for which logon was performed
@@ -4620,8 +4711,8 @@ OSSEM:
                 description: Token elevation type. It can be Default(1), Full(2) or
                   Limited(3)
                 field_name: TokenElevationType
-                sample_value: null
-                type: integer
+                sample_value: '%%1938'
+                type: string
               target_user_domain:
                 description: target account's domain or computer name.
                 field_name: TargetDomainName
@@ -6255,8 +6346,8 @@ OSSEM:
             title: 'Event ID 4741: A computer account was created'
           '4742':
             data_dictionary:
-              ? ''
-              : description: ''
+              computer_account_change:
+                description: ''
                 field_name: ComputerAccountChange
                 sample_value: '-'
                 type: string
@@ -8049,8 +8140,38 @@ OSSEM:
             title: 'Event ID 4803: The screen saver was dismissed'
           '4932':
             data_dictionary:
-              ? ''
-              : description: Naming Context's USN number before replication begins.
+              destination_dra:
+                description: destination directory replication agent distinguished
+                  name.
+                field_name: DestinationDRA
+                sample_value: CN=NTDS Settings,CN=DC01,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=contoso,DC=local
+                type: string
+              naming_context:
+                description: naming context to replicate.
+                field_name: NamingContext
+                sample_value: CN=Schema,CN=Configuration,DC=contoso,DC=local
+                type: string
+              options:
+                description: decimal value of DRS Options.
+                field_name: Options
+                sample_value: 2147483733
+                type: integer
+              session_id:
+                description: 'unique identifier of replication session. Using this
+                  field you can find "4932: Synchronization of a replica of an Active
+                  Directory naming context has begun." and "4933: Synchronization
+                  of a replica of an Active Directory naming context has ended." events
+                  for the same session.'
+                field_name: SessionID
+                sample_value: 48
+                type: integer
+              source_dra:
+                description: source directory replication agent distinguished name.
+                field_name: SourceDRA
+                sample_value: CN=NTDS Settings,CN=WIN2012R2,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=contoso,DC=local
+                type: string
+              start_usn:
+                description: Naming Context's USN number before replication begins.
                 field_name: StartUSN
                 sample_value: 20869
                 type: integer
@@ -8067,8 +8188,43 @@ OSSEM:
               naming context has begun'
           '4933':
             data_dictionary:
-              ? ''
-              : description: if there are no issues or errors, the status code will
+              destination_dra:
+                description: destination directory replication agent distinguished
+                  name.
+                field_name: DestinationDRA
+                sample_value: CN=NTDS Settings,CN=DC01,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=contoso,DC=local
+                type: string
+              end_usn:
+                description: Naming Context's USN number after replication ends.
+                field_name: EndUSN
+                sample_value: 20869
+                type: integer
+              naming_context:
+                description: naming context to replicate.
+                field_name: NamingContext
+                sample_value: CN=Schema,CN=Configuration,DC=contoso,DC=local
+                type: string
+              options:
+                description: decimal value of DRS Options.
+                field_name: Options
+                sample_value: 2147483733
+                type: integer
+              session_id:
+                description: 'unique identifier of replication session. Using this
+                  field you can find "4932: Synchronization of a replica of an Active
+                  Directory naming context has begun." and "4933: Synchronization
+                  of a replica of an Active Directory naming context has ended." events
+                  for the same session.'
+                field_name: SessionID
+                sample_value: 40
+                type: integer
+              source_dra:
+                description: source directory replication agent distinguished name.
+                field_name: SourceDRA
+                sample_value: CN=NTDS Settings,CN=WIN2012R2,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=contoso,DC=local
+                type: string
+              status_code:
+                description: if there are no issues or errors, the status code will
                   be "0". If an error happened, you will receive Failure event and
                   Status Code will not be equal to "0".
                 field_name: StatusCode
@@ -8669,6 +8825,72 @@ OSSEM:
                 policy
             title: 'Event ID 5378: The requested credentials delegation was disallowed
               by policy'
+          '5379':
+            data_dictionary:
+              credential_read_returned_count:
+                description: ''
+                field_name: CountOfCredentialsReturned
+                sample_value: 0
+                type: integer
+              credentials_read:
+                description: stored credentials that were read
+                field_name: TargetName
+                sample_value: WindowsLive:(token):name=xxxxxasas;serviceuri=*
+                type: string
+              credentials_read_returned_code:
+                description: ''
+                field_name: ReturnCode
+                sample_value: '0'
+                type: string
+              credentials_read_type:
+                description: ''
+                field_name: Type
+                sample_value: 0
+                type: integer
+              object_operation_type:
+                description: ''
+                field_name: ReadOperation
+                sample_value: '%%8100'
+                type: string
+              process_creation_time:
+                description: ''
+                field_name: ProcessCreationTime
+                sample_value: '2019-02-25T22:33:21.621488200Z'
+                type: date
+              process_id:
+                description: ''
+                field_name: ClienProcessId
+                sample_value: 4432
+                type: integer
+              user_domain:
+                description: subject's domain or computer name
+                field_name: SubjectDomainName
+                sample_value: SHIRE
+                type: string
+              user_logon_id:
+                description: hexadecimal value that can help you correlate this event
+                  with recent events that might contain the same Logon ID
+                field_name: SubjectLogonId
+                sample_value: 999
+                type: integer
+              user_name:
+                description: the name of the account that performed a read operation
+                  on stored credentials in CM
+                field_name: SubjectUserName
+                sample_value: ACCT001$
+                type: string
+              user_sid:
+                description: SID of account that performed a read operation on stored
+                  credentials in CM
+                field_name: SubjectUserSid
+                sample_value: S-1-5-18
+                type: string
+            description:
+              text: This event occurs when a user performs a read operation on stored
+                credentials in Credential Manager.
+            meta:
+              Event ID 5379: Credential Manager credentials were read
+            title: 'Event ID 5379: Credential Manager credentials were read'
           '5632':
             data_dictionary:
               event_error_code:
@@ -8890,10 +9112,97 @@ OSSEM:
         README: null
         accesstoken:
           data_dictionary:
-            ? ''
-            : description: Token's elevation level
+            authentication_id:
+              description: Unique identifier of the logon session this token represents
+              field_name: AuthenticationId
+              sample_value: '351709'
+              type: LONG
+            elevation_type:
+              description: Token's elevation level
               field_name: ElevationType
               sample_value: TokenElevationTypeFull
+              type: TEXT
+            id:
+              description: SO Host Data's unique identifier of this instance
+              field_name: Id
+              sample_value: 8C3C0F18E053F361BF80D7BD126F67A5B7BE8241388802ABA430D751F60CD7D3
+              type: TEXT
+            integrity_level:
+              description: Integrity level of token
+              field_name: IntegrityLevel
+              sample_value: HIGH_MANDATORY_LEVEL
+              type: TEXT
+            is_elevated:
+              description: Specifies if the token is elevated
+              field_name: IsElevated
+              sample_value: 'True'
+              type: BOOLEAN
+            logon_session_key:
+              description: SO Host Data's unique identifier of associated logon session
+              field_name: LogonSessionKey
+              sample_value: EC0AC744FFFBE3228F9E73EC60FA74F3BAB8330DFBCA51B269FC8A3B3B5DD7CD
+              type: TEXT
+            modified_id:
+              description: A value that changes each time the token is modified
+              field_name: ModifiedId
+              sample_value: '26239987'
+              type: LONG
+            origin:
+              description: Originating logon session
+              field_name: Origin
+              sample_value: '999'
+              type: LONG
+            owner_name:
+              description: Default owner's name
+              field_name: OwnerName
+              sample_value: BUILTIN\Administrators
+              type: TEXT
+            owner_sid:
+              description: Default owner's security identifier
+              field_name: OwnerSid
+              sample_value: S-1-5-32-544
+              type: TEXT
+            primary_token_key:
+              description: SO Host Data's unique identifier of containing process's
+                primary token
+              field_name: PrimaryTokenKey
+              sample_value: 8C3C0F18E053F361BF80D7BD126F67A5B7BE8241388802ABA430D751F60CD7D3
+              type: TEXT
+            privileges:
+              description: Token's enabled privileges
+              field_name: Privileges
+              sample_value: SeDebugPrivilege;SeChangeNotifyPrivilege;SeImpersonatePrivilege;SeCreateGlobalPrivilege
+              type: TEXT
+            session_id:
+              description: Token's terminal services session
+              field_name: SessionId
+              sample_value: 1
+              type: INTEGER
+            source_type:
+              description: Type of data represented
+              field_name: SourceType
+              sample_value: WinEvent-Token
+              type: TEXT
+            token_id:
+              description: Unique identifier of the token
+              field_name: TokenId
+              sample_value: '26235631'
+              type: LONG
+            type:
+              description: Indicates whether the token is a primary or impersonation
+                token
+              field_name: Type
+              sample_value: TokenPrimary
+              type: TEXT
+            user_sid:
+              description: Security identifier of token's user
+              field_name: UserSid
+              sample_value: S-1-5-21-386661145-2656271985-3844047388-1001
+              type: TEXT
+            username:
+              description: Name of token's user
+              field_name: UserName
+              sample_value: DESKTOP-HMTGQ0R\tester
               type: TEXT
           description:
             text: Get-SOHostData collects Access Tokens from every running Process
@@ -8913,8 +9222,83 @@ OSSEM:
           so-host-data.png: null
         kerberosticketgrantingticket:
           data_dictionary:
-            ? ''
-            : description: The measured time difference between the current time on
+            alt_target_domain_name:
+              description: Synonym for the destination domain
+              field_name: AltTargetDomainName
+              sample_value: deathstar.empire.com
+              type: TEXT
+            client_name:
+              description: The client name in the ticket
+              field_name: ClientName
+              sample_value: DarthVader
+              type: TEXT
+            domain_name:
+              description: The domain that corresponds to the ServiceName
+              field_name: DomainName
+              sample_value: deathstar.empire.com
+              type: TEXT
+            end_time:
+              description: Time at which the ticket expires
+              field_name: EndTime
+              sample_value: 2/19/2028 4:13:40 AM
+              type: DATE
+            id:
+              description: SO Host Data's unique identifier of this instance
+              field_name: Id
+              sample_value: 82E5CB03112897B20C6FF61BE5B9BF7D574B74E5176C51E738BCAB894C98A1E1
+              type: TEXT
+            key_expiration_time:
+              description: Time at which the key expires
+              field_name: KeyExpirationTime
+              sample_value: 1/1/1601 1:00:00 AM
+              type: DATE
+            logon_session_key:
+              description: SO Host Data's unique identifier of associated logon session
+              field_name: LogonSessionKey
+              sample_value: EC0AC744FFFBE3228F9E73EC60FA74F3BAB8330DFBCA51B269FC8A3B3B5DD7CD
+              type: TEXT
+            renew_util:
+              description: The latest time a ticket can be renewed
+              field_name: RenewUntil
+              sample_value: 2/19/2028 4:13:40 AM
+              type: DATE
+            service_name:
+              description: A multiple part, canonical, service name
+              field_name: ServiceName
+              sample_value: krbtgt
+              type: TEXT
+            session_key:
+              description: The session key for the ticket
+              field_name: SessionKey
+              sample_value: D55F31C27D4C4517D4B86D72BF8B7276
+              type: TEXT
+            session_key_type:
+              description: The type of encryption used for the session key
+              field_name: SessionKeyType
+              sample_value: rc4_hmac
+              type: TEXT
+            source_type:
+              description: Type of data represented
+              field_name: SourceType
+              sample_value: WinEvent-KerberosTicketGrantingTicket
+              type: TEXT
+            start_time:
+              description: Time at which the ticket becomes valid
+              field_name: StartTime
+              sample_value: 2/21/2018 4:13:40 AM
+              type: DATE
+            target_domain_name:
+              description: The name of the domain in which the ticket is valid
+              field_name: TargetDomainName
+              sample_value: deathstar.empire.com
+              type: TEXT
+            ticket_flags:
+              description: Ticket flags, as defined in Internet RFC 4120
+              field_name: TicketFlags
+              sample_value: pre_authent, initial, renewable, forwardable
+              type: TEXT
+            time_skew:
+              description: The measured time difference between the current time on
                 the computer issuing the ticket and the computer where the ticket
                 will be used
               field_name: TimeSkew
@@ -8935,11 +9319,136 @@ OSSEM:
           title: 'Source Type: Kerberos Ticket Granting Ticket'
         logonsession:
           data_dictionary:
-            ? ''
-            : description: Time when password must change
+            authentication_package:
+              description: Authentication package used to authenticate
+              field_name: AuthenticationPackage
+              sample_value: NTLM
+              type: TEXT
+            dns_domain_name:
+              description: DNS name of the logon session owner
+              field_name: DnsDomainName
+              sample_value: ''
+              type: TEXT
+            failed_attempt_count_since_last_successful_logon:
+              description: ''
+              field_name: FailedAttemptCountSinceLastSuccessfulLogon
+              sample_value: '0'
+              type: ''
+            home_directory:
+              description: Home directory for the user's logon session
+              field_name: HomeDirectory
+              sample_value: ''
+              type: TEXT
+            home_directory_drive:
+              description: Drive location of the home directory
+              field_name: HomeDirectoryDrive
+              sample_value: ''
+              type: TEXT
+            id:
+              description: SO Host Data's unique identifier of this instance
+              field_name: Id
+              sample_value: EC0AC744FFFBE3228F9E73EC60FA74F3BAB8330DFBCA51B269FC8A3B3B5DD7CD
+              type: TEXT
+            kickoff_time:
+              description: Time that the session must end
+              field_name: KickoffTime
+              sample_value: 1/1/1970 1:00:00 AM
+              type: DATE
+            last_failed_logon:
+              description: ''
+              field_name: LastFailedLogon
+              sample_value: '0'
+              type: ''
+            last_successful_logon:
+              description: Information about the last logon
+              field_name: LastSuccessfulLogon
+              sample_value: 0
+              type: INTEGER
+            logoff_time:
+              description: Time when session user logged off
+              field_name: LogoffTime
+              sample_value: 1/1/1970 1:00:00 AM
+              type: DATE
+            logon_domain:
+              description: Domain name used to authenticate
+              field_name: LogonDomain
+              sample_value: ''
+              type: TEXT
+            logon_id:
+              description: Unique identifier for Logon Session
+              field_name: LogonId
+              sample_value: '351709'
+              type: LONG
+            logon_script:
+              description: Script user for logging on
+              field_name: LogonScript
+              sample_value: ''
+              type: TEXT
+            logon_server:
+              description: Server used to authenticate
+              field_name: LogonServer
+              sample_value: DESKTOP-HMTGQ0R
+              type: TEXT
+            logon_time:
+              description: Time the session owner logged on
+              field_name: LogonTime
+              sample_value: 2/20/2018 6:05:46 PM
+              type: DATE
+            logon_type:
+              description: Logon method
+              field_name: LogonType
+              sample_value: Interactive
+              type: TEXT
+            password_can_change:
+              description: Time when password can change
+              field_name: PasswordCanChange
+              sample_value: 8/14/2015 5:43:32 PM
+              type: DATE
+            password_last_set:
+              description: Time when the user last set their password
+              field_name: PasswordLastSet
+              sample_value: 8/13/2015 5:43:32 PM
+              type: DATE
+            password_must_change:
+              description: Time when password must change
               field_name: PasswordMustChange
               sample_value: 1/1/1970 1:00:00 AM
               type: DATE
+            profile_path:
+              description: Path of the user's profile
+              field_name: ProfilePath
+              sample_value: ''
+              type: TEXT
+            session:
+              description: Terminal services session identifier
+              field_name: Session
+              sample_value: '1'
+              type: LONG
+            sid:
+              description: User's security identifier
+              field_name: Sid
+              sample_value: S-1-5-21-386661145-2656271985-3844047388-1001
+              type: TEXT
+            source_type:
+              description: Type of data represented
+              field_name: SourceType
+              sample_value: WinEvent-LogonSession
+              type: TEXT
+            upn:
+              description: User principal name of the logon session owner
+              field_name: Upn
+              sample_value: ''
+              type: TEXT
+            user_flags:
+              description: User flags for logon session
+              field_name: UserFlags
+              sample_value: 33056
+              type: INTEGER
+            username:
+              description: Account name that owns the logon session
+              field_name: UserName
+              sample_value: tester
+              type: TEXT
           description:
             text: Get-SOHostData uses the LsaEnumerateLogonSessions and LsaGetLogonSessionData
               APIs to enumerate active Logon Sessions running on the target system.
@@ -8954,8 +9463,55 @@ OSSEM:
           title: SO Host Data - Logon Session Table
         memoryregion:
           data_dictionary:
-            ? ''
-            : description: The type of pages in the region
+            allocation_base:
+              description: The base address of a range of pages allocated by the VirtualAlloc
+                function
+              field_name: AllocationBase
+              sample_value: '1896232255488'
+              type: LONG
+            allocation_protect:
+              description: The memory protection option when the region was initially
+                allocated
+              field_name: AllocationProtect
+              sample_value: PAGE_EXECUTE_READWRITE
+              type: TEXT
+            base_address:
+              description: The base address of the region of pages
+              field_name: BaseAddress
+              sample_value: '1896232255488'
+              type: LONG
+            id:
+              description: SO Host Data's unique identifier of this instance
+              field_name: Id
+              sample_value: 702B162209227ABEAB3980BA3B3252CF391233747B036B9F65DAF2E015579019
+              type: TEXT
+            process_key:
+              description: SO Host Data's unique identifier of containing process
+              field_name: ProcessKey
+              sample_value: BBB8A0D8A8A3EF0148FE5E4DF188E7FC39741EE4554152B9E6513FE95F4E377B
+              type: TEXT
+            protect:
+              description: The access protection of the pages in the region
+              field_name: Protect
+              sample_value: PAGE_EXECUTE_READWRITE
+              type: TEXT
+            region_size:
+              description: The size of the region starting at the base address
+              field_name: RegionSize
+              sample_value: '4096'
+              type: LONG
+            source_type:
+              description: Type of data represented
+              field_name: SourceType
+              sample_value: WinEvent-MemoryRegion
+              type: TEXT
+            state:
+              description: The state of the pages in the region
+              field_name: State
+              sample_value: MEM_COMMIT
+              type: TEXT
+            type:
+              description: The type of pages in the region
               field_name: Type
               sample_value: MEM_PRIVATE
               type: TEXT
@@ -8973,10 +9529,55 @@ OSSEM:
           title: SO Host Data - Memory Region Table
         process:
           data_dictionary:
-            ? ''
-            : description: The command string used to launch the process
+            command_line:
+              description: The command string used to launch the process
               field_name: CommandLine
               sample_value: '"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"'
+              type: TEXT
+            id:
+              description: SO Host Data's unique identifier of this instance
+              field_name: Id
+              sample_value: BBB8A0D8A8A3EF0148FE5E4DF188E7FC39741EE4554152B9E6513FE95F4E377B
+              type: TEXT
+            parent_process_key:
+              description: SO Host Data's unique identifier of parent process
+              field_name: ParentProcessKey
+              sample_value: B8148C17D1C227B6D50E54CB6EF93738852340CF4682E63292F1197330BBE579
+              type: TEXT
+            path:
+              description: The location of the process binary on disk
+              field_name: Path
+              sample_value: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+              type: TEXT
+            process_id:
+              description: Process's unique identifier
+              field_name: ProcessId
+              sample_value: 8540
+              type: INTEGER
+            process_name:
+              description: Name of the process
+              field_name: ProcessName
+              sample_value: powershell
+              type: TEXT
+            sha256_hash:
+              description: SHA256Hash of the process's main module on disk
+              field_name: SHA256Hash
+              sample_value: CCC8538DD62F20999717E2BBAB58A18973B938968D699154DF9233698A899EFA
+              type: TEXT
+            source_type:
+              description: Type of data represented
+              field_name: SourceType
+              sample_value: WinEvent-Process
+              type: TEXT
+            start_time:
+              description: The time the process was started
+              field_name: StartTime
+              sample_value: 2/20/2018 11:00:09 PM
+              type: DATE
+            token_key:
+              description: SO Host Data's unique identifier of associated access token
+              field_name: TokenKey
+              sample_value: 8C3C0F18E053F361BF80D7BD126F67A5B7BE8241388802ABA430D751F60CD7D3
               type: TEXT
           description:
             text: Get-SOHostData enumerates active processes on the scanned system.
@@ -8993,8 +9594,93 @@ OSSEM:
           title: SO Host Data - Process Table
         thread:
           data_dictionary:
-            ? ''
-            : description: The reason that the thread is waiting
+            base_priority:
+              description: The base priority of the thread
+              field_name: BasePriority
+              sample_value: 8
+              type: INTEGER
+            current_priority:
+              description: The current priority of the thread
+              field_name: CurrentPriority
+              sample_value: 8
+              type: INTEGER
+            id:
+              description: SO Host Data's unique identifier of this instance
+              field_name: Id
+              sample_value: EB4D6E286995C97714EB6EBF8C44E252342E3BAB2B1BF10764FD2386FEBB08D7
+              type: TEXT
+            memory_region_key:
+              description: SO Host Data's unique identifier of associated memory region
+              field_name: MemoryRegionKey
+              sample_value: 702B162209227ABEAB3980BA3B3252CF391233747B036B9F65DAF2E015579019
+              type: TEXT
+            priority_boost_enabled:
+              description: Indicates if the OS should boost the priority of the thread
+                when the main window is active
+              field_name: PriorityBoostEnabled
+              sample_value: 'True'
+              type: BOOLEAN
+            priority_level:
+              description: The priority level of the thread
+              field_name: PriorityLevel
+              sample_value: Normal
+              type: TEXT
+            privileged_processor_time:
+              description: The amount of time the thread has spent in the operating
+                system core
+              field_name: PrivilegedProcessorTime
+              sample_value: 00:00:00
+              type: ''
+            process_key:
+              description: SO Host Data's unique identifier of containing process
+              field_name: ProcessKey
+              sample_value: BBB8A0D8A8A3EF0148FE5E4DF188E7FC39741EE4554152B9E6513FE95F4E377B
+              type: TEXT
+            source_type:
+              description: Type of data represented
+              field_name: SourceType
+              sample_value: WinEvent-Thread
+              type: TEXT
+            start_time:
+              description: Time the thread started
+              field_name: StartTime
+              sample_value: 2/20/2018 11:01:10 PM
+              type: DATE
+            thread_id:
+              description: Unique identifier of the thread
+              field_name: ThreadId
+              sample_value: 4784
+              type: INTEGER
+            thread_start_address:
+              description: The memory address of the function called to start the
+                thread
+              field_name: ThreadStartAddress
+              sample_value: '1896232255488'
+              type: LONG
+            thread_state:
+              description: The current state of the thread
+              field_name: ThreadState
+              sample_value: Wait
+              type: TEXT
+            token_key:
+              description: SO Host Data's unique identifier of associated access token
+              field_name: TokenKey
+              sample_value: 8C3C0F18E053F361BF80D7BD126F67A5B7BE8241388802ABA430D751F60CD7D3
+              type: TEXT
+            total_processor_time:
+              description: The total amount of time that the processor has spent on
+                this thread
+              field_name: TotalProcessorTime
+              sample_value: 00:00:00
+              type: ''
+            user_processor_time:
+              description: The amount of time that the thread has spent running code
+                inside the application
+              field_name: UserProcessorTime
+              sample_value: 00:00:00
+              type: ''
+            wait_reason:
+              description: The reason that the thread is waiting
               field_name: WaitReason
               sample_value: Suspended
               type: TEXT
@@ -9156,32 +9842,34 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>1</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>1</EventID>\
               \ \n    <Version>5</Version> \n    <Level>4</Level> \n    <Task>1</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:25:02.959125700Z\" />\
-              \ \n    <EventRecordID>11748095</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2152\" ThreadID=\"3392\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:25:02.955</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-9C2E-5ACD-0000-0010396CAB00}</Data>\
-              \ \n    <Data Name=\"ProcessId\">4756</Data> \n    <Data Name=\"Image\"\
-              >C:\\Windows\\System32\\conhost.exe</Data> \n    <Data Name=\"FileVersion\"\
-              >10.0.16299.15 (WinBuild.160101.0800)</Data> \n    <Data Name=\"Description\"\
-              >Console Window Host</Data> \n    <Data Name=\"Product\">Microsoft\xAE\
-              \ Windows\xAE Operating System</Data> \n    <Data Name=\"Company\">Microsoft\
-              \ Corporation</Data> \n    <Data Name=\"CommandLine\">\\??\\C:\\WINDOWS\\\
-              system32\\conhost.exe 0xffffffff -ForceV1</Data> \n    <Data Name=\"\
-              CurrentDirectory\">C:\\WINDOWS</Data> \n    <Data Name=\"User\">DESKTOP-WARDOG\\\
-              wardog</Data> \n    <Data Name=\"LogonGuid\">{A98268C1-95F2-5ACD-0000-002019620F00}</Data>\
-              \ \n    <Data Name=\"LogonId\">0xf6219</Data> \n    <Data Name=\"TerminalSessionId\"\
-              >1</Data> \n    <Data Name=\"IntegrityLevel\">Medium</Data> \n    <Data\
-              \ Name=\"Hashes\">SHA1=B0BF5AC2E81BBF597FAD5F349FEEB32CAC449FA2,MD5=6A255BEBF3DBCD13585538ED47DBAFD7,SHA256=4668BB2223FFB983A5F1273B9E3D9FA2C5CE4A0F1FB18CA5C1B285762020073C,IMPHASH=2505BD03D7BD285E50CE89CEC02B333B</Data>\
-              \ \n    <Data Name=\"ParentProcessGuid\">{A98268C1-9C2E-5ACD-0000-00100266AB00}</Data>\
-              \ \n    <Data Name=\"ParentProcessId\">240</Data> \n    <Data Name=\"\
-              ParentImage\">C:\\Windows\\System32\\cmd.exe</Data> \n    <Data Name=\"\
-              ParentCommandLine\">\"C:\\WINDOWS\\system32\\cmd.exe\"</Data> \n  </EventData>\n\
-              </Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:20.660478200Z\" />\
+              \ \n    <EventRecordID>3609953</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:11:17.717</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9e25-5cc3-0000-00108b7d0500}</Data>\
+              \ \n    <Data Name=\"ProcessId\">3632</Data> \n    <Data Name=\"Image\"\
+              >C:\\Windows\\System32\\msdtc.exe</Data> \n    <Data Name=\"FileVersion\"\
+              >2001.12.10941.16384 (WinBuild.160101.0800)</Data> \n    <Data Name=\"\
+              Description\">Microsoft Distributed Transaction Coordinator Service</Data>\
+              \ \n    <Data Name=\"Product\">Microsoft\xAE Windows\xAE Operating System</Data>\
+              \ \n    <Data Name=\"Company\">Microsoft Corporation</Data> \n    <Data\
+              \ Name=\"CommandLine\">C:\\WINDOWS\\System32\\msdtc.exe</Data> \n  \
+              \  <Data Name=\"CurrentDirectory\">C:\\WINDOWS\\system32\\</Data> \n\
+              \    <Data Name=\"User\">NT AUTHORITY\\NETWORK SERVICE</Data> \n   \
+              \ <Data Name=\"LogonGuid\">{1c9fdc81-9e17-5cc3-0000-0020e4030000}</Data>\
+              \ \n    <Data Name=\"LogonId\">0x3e4</Data> \n    <Data Name=\"TerminalSessionId\"\
+              >0</Data> \n    <Data Name=\"IntegrityLevel\">System</Data> \n    <Data\
+              \ Name=\"Hashes\">SHA1=A002BC39095E7F9A3C3281505A42876F480FB95F,MD5=7215CE218BDEAD41B708F098258CF972,SHA256=1EAB4B9691E9EFA1DA02BDCB84035F65EDA4B525E5AEE925A6E1E4107F8E4F31,IMPHASH=D76D41E51FC79BF5C56F90FE6A798765</Data>\
+              \ \n    <Data Name=\"ParentProcessGuid\">{1c9fdc81-9e16-5cc3-0000-0010c5ba0000}</Data>\
+              \ \n    <Data Name=\"ParentProcessId\">780</Data> \n    <Data Name=\"\
+              ParentImage\">C:\\Windows\\System32\\services.exe</Data> \n    <Data\
+              \ Name=\"ParentCommandLine\">C:\\WINDOWS\\system32\\services.exe</Data>\
+              \ \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -9191,12 +9879,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The process creation event provides extended information
               about a newly created process.
             log_type: sysmon
             sysmon_rule: ProcessCreate
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 1 - Process creation
           title: 'Event ID 1: Process creation'
         '10':
@@ -9296,33 +9984,34 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>10</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>10</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>10</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:18:56.568570800Z\" />\
-              \ \n    <EventRecordID>11739559</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2152\" ThreadID=\"3392\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:18:56.566</Data> \n    <Data Name=\"SourceProcessGUID\"\
-              >{A98268C1-9587-5ACD-0000-001004C40000}</Data> \n    <Data Name=\"SourceProcessId\"\
-              >916</Data> \n    <Data Name=\"SourceThreadId\">2804</Data> \n    <Data\
-              \ Name=\"SourceImage\">C:\\WINDOWS\\system32\\svchost.exe</Data> \n\
-              \    <Data Name=\"TargetProcessGUID\">{A98268C1-9597-5ACD-0000-00101D690200}</Data>\
-              \ \n    <Data Name=\"TargetProcessId\">2288</Data> \n    <Data Name=\"\
-              TargetImage\">C:\\ProgramData\\Microsoft\\Windows Defender\\platform\\\
-              4.12.17007.18022-0\\MsMpEng.exe</Data> \n    <Data Name=\"GrantedAccess\"\
-              >0x1000</Data> \n    <Data Name=\"CallTrace\">C:\\WINDOWS\\SYSTEM32\\\
-              ntdll.dll+a0344|C:\\WINDOWS\\System32\\KERNELBASE.dll+64794|c:\\windows\\\
-              system32\\lsm.dll+10e93|c:\\windows\\system32\\lsm.dll+f9ea|C:\\WINDOWS\\\
-              System32\\RPCRT4.dll+76d23|C:\\WINDOWS\\System32\\RPCRT4.dll+d9390|C:\\\
-              WINDOWS\\System32\\RPCRT4.dll+a81c|C:\\WINDOWS\\System32\\RPCRT4.dll+273b4|C:\\\
-              WINDOWS\\System32\\RPCRT4.dll+2654e|C:\\WINDOWS\\System32\\RPCRT4.dll+26cfb|C:\\\
-              WINDOWS\\System32\\RPCRT4.dll+3083f|C:\\WINDOWS\\System32\\RPCRT4.dll+313a6|C:\\\
-              WINDOWS\\System32\\RPCRT4.dll+2d12e|C:\\WINDOWS\\System32\\RPCRT4.dll+2e853|C:\\\
-              WINDOWS\\System32\\RPCRT4.dll+5cc68|C:\\WINDOWS\\SYSTEM32\\ntdll.dll+365ce|C:\\\
-              WINDOWS\\SYSTEM32\\ntdll.dll+34b46|C:\\WINDOWS\\System32\\KERNEL32.DLL+11fe4|C:\\\
-              WINDOWS\\SYSTEM32\\ntdll.dll+6efc1</Data> \n  </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:22.803959000Z\" />\
+              \ \n    <EventRecordID>3611653</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:11:22.789</Data>\
+              \ \n    <Data Name=\"SourceProcessGUID\">{1c9fdc81-9e18-5cc3-0000-00108c680100}</Data>\
+              \ \n    <Data Name=\"SourceProcessId\">1252</Data> \n    <Data Name=\"\
+              SourceThreadId\">2084</Data> \n    <Data Name=\"SourceImage\">C:\\WINDOWS\\\
+              system32\\svchost.exe</Data> \n    <Data Name=\"TargetProcessGUID\"\
+              >{1c9fdc81-9e18-5cc3-0000-001021790100}</Data> \n    <Data Name=\"TargetProcessId\"\
+              >1340</Data> \n    <Data Name=\"TargetImage\">C:\\WINDOWS\\system32\\\
+              svchost.exe</Data> \n    <Data Name=\"GrantedAccess\">0x1000</Data>\
+              \ \n    <Data Name=\"CallTrace\">C:\\WINDOWS\\SYSTEM32\\ntdll.dll+9fb54|C:\\\
+              WINDOWS\\System32\\KERNELBASE.dll+20d0e|c:\\windows\\system32\\fwbase.dll+16e5|c:\\\
+              windows\\system32\\fwbase.dll+1639|c:\\windows\\system32\\mpssvc.dll+e42d|c:\\\
+              windows\\system32\\mpssvc.dll+cf2b|c:\\windows\\system32\\mpssvc.dll+cca7|C:\\\
+              WINDOWS\\System32\\RPCRT4.dll+77803|C:\\WINDOWS\\System32\\RPCRT4.dll+db4a6|C:\\\
+              WINDOWS\\System32\\RPCRT4.dll+10d20|C:\\WINDOWS\\System32\\RPCRT4.dll+54a38|C:\\\
+              WINDOWS\\System32\\RPCRT4.dll+304b0|C:\\WINDOWS\\System32\\RPCRT4.dll+2fe5b|C:\\\
+              WINDOWS\\System32\\RPCRT4.dll+221ff|C:\\WINDOWS\\System32\\RPCRT4.dll+2165a|C:\\\
+              WINDOWS\\System32\\RPCRT4.dll+20c21|C:\\WINDOWS\\System32\\RPCRT4.dll+20692|C:\\\
+              WINDOWS\\System32\\RPCRT4.dll+17465|C:\\WINDOWS\\SYSTEM32\\ntdll.dll+4f4c0|C:\\\
+              WINDOWS\\SYSTEM32\\ntdll.dll+50348|C:\\WINDOWS\\System32\\KERNEL32.DLL+17974|C:\\\
+              WINDOWS\\SYSTEM32\\ntdll.dll+6a271</Data> \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -9332,12 +10021,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The process accessed event reports when a process opens another
               process.
             log_type: sysmon
             sysmon_rule: ProcessAccess
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 10 - ProcessAccess
           title: 'Event ID 10: ProcessAccess'
         '11':
@@ -9384,20 +10073,21 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>11</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>11</EventID>\
               \ \n    <Version>2</Version> \n    <Level>4</Level> \n    <Task>11</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T06:01:23.107069400Z\" />\
-              \ \n    <EventRecordID>11760994</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 06:01:23.106</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-958A-5ACD-0000-0010C62F0100}</Data>\
-              \ \n    <Data Name=\"ProcessId\">1044</Data> \n    <Data Name=\"Image\"\
-              >C:\\WINDOWS\\System32\\svchost.exe</Data> \n    <Data Name=\"TargetFilename\"\
-              >C:\\Windows\\Prefetch\\CONHOST.EXE-1F3E9D7E.pf</Data> \n    <Data Name=\"\
-              CreationUtcTime\">2017-12-04 17:38:32.040</Data> \n  </EventData>\n\
-              </Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:22.786128800Z\" />\
+              \ \n    <EventRecordID>3611638</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:11:22.756</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9e27-5cc3-0000-0010116d0600}</Data>\
+              \ \n    <Data Name=\"ProcessId\">3832</Data> \n    <Data Name=\"Image\"\
+              >C:\\WINDOWS\\system32\\WerFault.exe</Data> \n    <Data Name=\"TargetFilename\"\
+              >C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\AppCrash_Sysmon.exe_16b56163a540d67bfc0dd95fd4d37fd83fe58dd_e290769b_0ef86f73\\\
+              Report.wer</Data> \n    <Data Name=\"CreationUtcTime\">2019-04-27 00:11:22.756</Data>\
+              \ \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -9407,12 +10097,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: File create operations are logged when a file is created
               or overwritten.
             log_type: sysmon
             sysmon_rule: FileCreate
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 11 - FileCreate
           title: 'Event ID 11: FileCreate'
         '12':
@@ -9460,20 +10150,21 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>12</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>12</EventID>\
               \ \n    <Version>2</Version> \n    <Level>4</Level> \n    <Task>12</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T06:02:54.827237700Z\" />\
-              \ \n    <EventRecordID>11761339</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"EventType\"\
-              >CreateKey</Data> \n    <Data Name=\"UtcTime\">2018-04-11 06:02:54.817</Data>\
-              \ \n    <Data Name=\"ProcessGuid\">{A98268C1-9595-5ACD-0000-0010C2380200}</Data>\
-              \ \n    <Data Name=\"ProcessId\">2052</Data> \n    <Data Name=\"Image\"\
-              >C:\\Program Files\\Common Files\\Microsoft Shared\\ClickToRun\\OfficeClickToRun.exe</Data>\
-              \ \n    <Data Name=\"TargetObject\">HKU\\.DEFAULT\\Software\\Microsoft\\\
-              Office\\16.0\\Common</Data> \n  </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:22.786058200Z\" />\
+              \ \n    <EventRecordID>3611636</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"EventType\">CreateKey</Data> \n   \
+              \ <Data Name=\"UtcTime\">2019-04-27 00:11:22.753</Data> \n    <Data\
+              \ Name=\"ProcessGuid\">{1c9fdc81-9e27-5cc3-0000-0010116d0600}</Data>\
+              \ \n    <Data Name=\"ProcessId\">3832</Data> \n    <Data Name=\"Image\"\
+              >C:\\WINDOWS\\system32\\WerFault.exe</Data> \n    <Data Name=\"TargetObject\"\
+              >HKLM\\System\\CurrentControlSet\\Control\\Hvsi</Data> \n  </EventData>\n\
+              </Event>"
             type: xml
           event_log_illustration:
             image:
@@ -9483,12 +10174,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: Registry key and value create and delete operations map to
               this event type.
             log_type: sysmon
             sysmon_rule: RegistryEvent
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 12 - RegistryEvent (Object create and delete)
           title: 'Event ID 12: RegistryEvent (Object create and delete)'
         '13':
@@ -9540,20 +10231,21 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>13</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>13</EventID>\
               \ \n    <Version>2</Version> \n    <Level>4</Level> \n    <Task>13</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T06:04:04.556170700Z\" />\
-              \ \n    <EventRecordID>11761526</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"EventType\"\
-              >SetValue</Data> \n    <Data Name=\"UtcTime\">2018-04-11 06:04:04.552</Data>\
-              \ \n    <Data Name=\"ProcessGuid\">{A98268C1-95F9-5ACD-0000-001025861000}</Data>\
-              \ \n    <Data Name=\"ProcessId\">4624</Data> \n    <Data Name=\"Image\"\
-              >C:\\WINDOWS\\Explorer.EXE</Data> \n    <Data Name=\"TargetObject\"\
-              >HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Notifications\\\
-              Data\\418A073AA3BC3475</Data> \n    <Data Name=\"Details\">Binary Data</Data>\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:20.698542300Z\" />\
+              \ \n    <EventRecordID>3610086</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"EventType\">SetValue</Data> \n    <Data\
+              \ Name=\"UtcTime\">2019-04-27 00:11:20.292</Data> \n    <Data Name=\"\
+              ProcessGuid\">{1c9fdc81-9e27-5cc3-0000-0010116d0600}</Data> \n    <Data\
+              \ Name=\"ProcessId\">3832</Data> \n    <Data Name=\"Image\">C:\\WINDOWS\\\
+              system32\\WerFault.exe</Data> \n    <Data Name=\"TargetObject\">\\REGISTRY\\\
+              A\\{417d6f3b-d84a-b9e2-2491-4db6453a55c9}\\Root\\InventoryApplicationFile\\\
+              WritePermissionsCheck</Data> \n    <Data Name=\"Details\">DWORD (0x00000001)</Data>\
               \ \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
@@ -9564,11 +10256,11 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: This Registry event type identifies Registry value modifications.
             log_type: sysmon
             sysmon_rule: RegistryEvent
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 13 - RegistryEvent (Value Set)
           title: 'Event ID 13: RegistryEvent (Value Set)'
         '14':
@@ -9621,21 +10313,22 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>14</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>14</EventID>\
               \ \n    <Version>2</Version> \n    <Level>4</Level> \n    <Task>14</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T06:14:57.050339700Z\" />\
-              \ \n    <EventRecordID>11765950</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"EventType\"\
-              >RenameKey</Data> \n    <Data Name=\"UtcTime\">2018-04-11 06:14:57.040</Data>\
-              \ \n    <Data Name=\"ProcessGuid\">{A98268C1-A7BF-5ACD-0000-00106B2EBE00}</Data>\
-              \ \n    <Data Name=\"ProcessId\">2676</Data> \n    <Data Name=\"Image\"\
-              >C:\\Windows\\regedit.exe</Data> \n    <Data Name=\"TargetObject\">HKLM\\\
-              SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\New Key #1</Data>\
-              \ \n    <Data Name=\"NewName\">\\REGISTRY\\MACHINE\\SOFTWARE\\Microsoft\\\
-              Windows\\CurrentVersion\\Run\\hello</Data> \n  </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:55:25.938142200Z\" />\
+              \ \n    <EventRecordID>3623832</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"1432\" ThreadID=\"6344\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"EventType\">RenameKey</Data> \n   \
+              \ <Data Name=\"UtcTime\">2019-04-27 00:55:25.926</Data> \n    <Data\
+              \ Name=\"ProcessGuid\">{1c9fdc81-a79f-5cc3-0000-001084f96100}</Data>\
+              \ \n    <Data Name=\"ProcessId\">2904</Data> \n    <Data Name=\"Image\"\
+              >C:\\WINDOWS\\regedit.exe</Data> \n    <Data Name=\"TargetObject\">HKLM\\\
+              SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\\New Key #1</Data>\
+              \ \n    <Data Name=\"NewName\">HKLM\\SOFTWARE\\Microsoft\\Windows\\\
+              CurrentVersion\\RunOnce\\wardog</Data> \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -9645,12 +10338,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: Registry key and value rename operations map to this event
               type.
             log_type: sysmon
             sysmon_rule: RegistryEvent
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 14 - RegistryEvent (Key and Value Rename)
           title: 'Event ID 14: RegistryEvent (Key and Value Rename)'
         '15':
@@ -9709,21 +10402,22 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>15</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>15</EventID>\
               \ \n    <Version>2</Version> \n    <Level>4</Level> \n    <Task>15</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T06:18:33.145878300Z\" />\
-              \ \n    <EventRecordID>11768076</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 06:18:33.143</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-A8A0-5ACD-0000-001087DEBF00}</Data>\
-              \ \n    <Data Name=\"ProcessId\">6972</Data> \n    <Data Name=\"Image\"\
-              >C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe</Data>\
-              \ \n    <Data Name=\"TargetFilename\">C:\\Users\\wardog\\Downloads\\\
-              a0fa35bc5badf505f803921f0fe40971-4cf6bad280c7b66e21bb8e96ffe2f968ca460e0d.zip:Zone.Identifier</Data>\
-              \ \n    <Data Name=\"CreationUtcTime\">2018-04-11 06:18:30.960</Data>\
-              \ \n    <Data Name=\"Hash\">SHA1=F897DA14CF93C872CE821F549C34B848E345C8AC,MD5=697C69E7BB023075F14BC0BE25B875D8,SHA256=3157F3E7A854A13A40FFC79472C319E5B7C744B50D869D6E45F40CD4218539C5,IMPHASH=00000000000000000000000000000000</Data>\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:56:56.489937100Z\" />\
+              \ \n    <EventRecordID>3625973</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"1432\" ThreadID=\"6344\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:56:56.485</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9f43-5cc3-0000-001049783700}</Data>\
+              \ \n    <Data Name=\"ProcessId\">5220</Data> \n    <Data Name=\"Image\"\
+              >C:\\WINDOWS\\system32\\browser_broker.exe</Data> \n    <Data Name=\"\
+              TargetFilename\">C:\\Users\\cbrown\\MicrosoftEdgeBackups\\backups\\\
+              MicrosoftEdgeBackup20190426\\MicrosoftEdgeCookiesBackup.dat</Data> \n\
+              \    <Data Name=\"CreationUtcTime\">2019-04-27 00:56:56.481</Data> \n\
+              \    <Data Name=\"Hash\">SHA1=DA39A3EE5E6B4B0D3255BFEF95601890AFD80709,MD5=D41D8CD98F00B204E9800998ECF8427E,SHA256=E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855,IMPHASH=00000000000000000000000000000000</Data>\
               \ \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
@@ -9734,11 +10428,11 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: This event logs when a named file stream is created.
             log_type: sysmon
             sysmon_rule: FileCreateStreamHash
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 15 - FileCreateStreamHash
           title: 'Event ID 15: FileCreateStreamHash'
         '16':
@@ -9763,18 +10457,19 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>16</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>16</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>16</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T06:22:44.899735300Z\" />\
-              \ \n    <EventRecordID>11771907</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"424\" ThreadID=\"5472\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-21-3825400013-1856045589-1834093677-1001\" /> \n  </System>\n\
-              \  <EventData>\n    <Data Name=\"UtcTime\">2018-04-11 06:22:44.887</Data>\
-              \ \n    <Data Name=\"Configuration\">C:\\Tools\\sysmon_config\\StartLogging.xml</Data>\
-              \ \n    <Data Name=\"ConfigurationFileHash\">SHA1=647B4A564FA2684252EFB1EA550A06EC432418C8</Data>\
-              \ \n  </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:48:17.287470500Z\" />\
+              \ \n    <EventRecordID>3611662</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"6988\" ThreadID=\"5844\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-21-1727583317-3931901456-1912079981-1119\" /> \n  </System>\n\
+              \  <EventData>\n    <Data Name=\"UtcTime\">2019-04-27 00:48:17.287</Data>\
+              \ \n    <Data Name=\"Configuration\">c:\\Users\\cbrown\\Downloads\\\
+              start_logging.xml</Data> \n    <Data Name=\"ConfigurationFileHash\"\
+              >SHA1=803AC0F31896AC15B187E6B3FB23494852D1DBE1</Data> \n  </EventData>\n\
+              </Event>"
             type: xml
           event_log_illustration:
             image:
@@ -9784,11 +10479,11 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: This event logs when the local sysmon configuration is updated.
             log_type: sysmon
             sysmon_rule: cannot be filtered
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 16 - Sysmon Config State Changed
           title: Event ID 16 - Sysmon Config State Changed
         '17':
@@ -9828,18 +10523,19 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>17</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>17</EventID>\
               \ \n    <Version>1</Version> \n    <Level>4</Level> \n    <Task>17</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T06:21:28.950312900Z\" />\
-              \ \n    <EventRecordID>11769418</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 06:21:28.947</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-A968-5ACD-0000-0010BD4EC200}</Data>\
-              \ \n    <Data Name=\"ProcessId\">1224</Data> \n    <Data Name=\"PipeName\"\
-              ><Anonymous Pipe></Data> \n    <Data Name=\"Image\">C:\\WINDOWS\\system32\\\
-              cmd.exe</Data> \n  </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:22.711620600Z\" />\
+              \ \n    <EventRecordID>3611610</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:11:22.672</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9e18-5cc3-0000-001021790100}</Data>\
+              \ \n    <Data Name=\"ProcessId\">1340</Data> \n    <Data Name=\"PipeName\"\
+              >\\browser</Data> \n    <Data Name=\"Image\">C:\\WINDOWS\\system32\\\
+              svchost.exe</Data> \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -9849,11 +10545,11 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: This event generates when a named pipe is created.
             log_type: sysmon
             sysmon_rule: PipeEvent
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 17 - PipeEvent (Pipe Created)
           title: 'Event ID 17: PipeEvent (Pipe Created)'
         '18':
@@ -9893,18 +10589,19 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>18</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>18</EventID>\
               \ \n    <Version>1</Version> \n    <Level>4</Level> \n    <Task>18</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T06:28:22.963327100Z\" />\
-              \ \n    <EventRecordID>11773738</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 06:28:22.960</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-959E-5ACD-0000-0010236E0300}</Data>\
-              \ \n    <Data Name=\"ProcessId\">1896</Data> \n    <Data Name=\"PipeName\"\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:22.672074000Z\" />\
+              \ \n    <EventRecordID>3611609</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:11:22.641</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9e18-5cc3-0000-001021790100}</Data>\
+              \ \n    <Data Name=\"ProcessId\">1340</Data> \n    <Data Name=\"PipeName\"\
               >\\srvsvc</Data> \n    <Data Name=\"Image\">C:\\WINDOWS\\system32\\\
-              wbem\\wmiprvse.exe</Data> \n  </EventData>\n</Event>"
+              svchost.exe</Data> \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -9914,12 +10611,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: This event logs when a named pipe connection is made between
               a client and a server.
             log_type: sysmon
             sysmon_rule: PipeEvent
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 18 - PipeEvent (Pipe Connected)
           title: 'Event ID 18: PipeEvent (Pipe Connected)'
         '19':
@@ -9977,21 +10674,21 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>19</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>19</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>19</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-09-11T23:12:46.619343600Z\" />\
-              \ \n    <EventRecordID>448094</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2204\" ThreadID=\"2316\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-LFD11QP</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"RuleName\"\
-              \ /> \n    <Data Name=\"EventType\">WmiFilterEvent</Data> \n    <Data\
-              \ Name=\"UtcTime\">2018-09-11 23:12:46.606</Data> \n    <Data Name=\"\
-              Operation\">Created</Data> \n    <Data Name=\"User\">DESKTOP-LFD11QP\\\
-              pedro</Data> \n    <Data Name=\"EventNamespace\">\"root\\\\CimV2\"</Data>\
-              \ \n    <Data Name=\"Name\">\"Updater\"</Data> \n    <Data Name=\"Query\"\
-              >\"SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance\
-              \ ISA 'Win32_PerfFormattedData_PerfOS_System' AND TargetInstance.SystemUpTime\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T01:04:02.146396600Z\" />\
+              \ \n    <EventRecordID>3631722</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"1432\" ThreadID=\"5672\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"EventType\">WmiFilterEvent</Data> \n\
+              \    <Data Name=\"UtcTime\">2019-04-27 01:04:02.146</Data> \n    <Data\
+              \ Name=\"Operation\">Created</Data> \n    <Data Name=\"User\">RIVENDELL\\\
+              cbrown</Data> \n    <Data Name=\"EventNamespace\">\"root\\\\CimV2\"\
+              </Data> \n    <Data Name=\"Name\">\"Updater\"</Data> \n    <Data Name=\"\
+              Query\">\"SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE\
+              \ TargetInstance ISA 'Win32_PerfFormattedData_PerfOS_System' AND TargetInstance.SystemUpTime\
               \ >= 240 AND TargetInstance.SystemUpTime < 325\"</Data> \n  </EventData>\n\
               </Event>"
             type: xml
@@ -10003,12 +10700,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 09/12/2018
+            date: 04/26/2019
             description: This event logs when a WMI event filter is registered, which
               is a method used by malware to execute
             log_type: sysmon
             sysmon_rule: WmiEvent
-            sysmon_version: '8.08'
+            sysmon_version: '9.01'
             title: Event ID 19 - WmiEvent (WmiEventFilter activity detected)
           title: 'Event ID 19: WmiEvent (WmiEventFilter activity detected)'
         '2':
@@ -10064,21 +10761,22 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>2</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>2</EventID>\
               \ \n    <Version>4</Version> \n    <Level>4</Level> \n    <Task>2</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:04:27.222624200Z\" />\
-              \ \n    <EventRecordID>11469394</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2152\" ThreadID=\"3392\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n    </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:04:27.211</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-975A-5ACD-0000-0010DB073A00}</Data>\
-              \ \n    <Data Name=\"ProcessId\">1252</Data> \n    <Data Name=\"Image\"\
-              >C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe</Data>\
-              \ \n    <Data Name=\"TargetFilename\">C:\\Users\\wardog\\AppData\\Roaming\\\
-              Microsoft\\Windows\\Recent\\CustomDestinations\\\n    7G23PHTPHSQ3S2RVKKPS.temp</Data>\
-              \ \n    <Data Name=\"CreationUtcTime\">2017-11-13 16:57:51.663</Data>\
-              \ \n    <Data Name=\"PreviousCreationUtcTime\">2018-04-11 05:04:27.179</Data>\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:10:30.035445300Z\" />\
+              \ \n    <EventRecordID>3605382</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2336\" ThreadID=\"3652\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>DESKTOP-LFD11QP.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:10:30.008</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9dc6-5cc3-0000-0010604f1300}</Data>\
+              \ \n    <Data Name=\"ProcessId\">6944</Data> \n    <Data Name=\"Image\"\
+              >C:\\Users\\cbrown\\AppData\\Local\\Microsoft\\OneDrive\\OneDrive.exe</Data>\
+              \ \n    <Data Name=\"TargetFilename\">C:\\Users\\cbrown\\AppData\\Local\\\
+              Microsoft\\OneDrive\\settings\\Personal\\global.temp.ini</Data> \n \
+              \   <Data Name=\"CreationUtcTime\">2018-10-21 00:54:18.030</Data> \n\
+              \    <Data Name=\"PreviousCreationUtcTime\">2018-10-21 00:54:18.030</Data>\
               \ \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
@@ -10089,12 +10787,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The change file creation time event is registered when a
               file creation time is explicitly modified by a process.
             log_type: sysmon
             sysmon_rule: FileCreateTime
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 2 - A process changed a file creation time
           title: 'Event ID 2: A process changed a file creation time'
         '20':
@@ -10149,22 +10847,21 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>20</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>20</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>20</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-09-12T00:41:00.762457400Z\" />\
-              \ \n    <EventRecordID>480410</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2204\" ThreadID=\"5784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-LFD11QP</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"RuleName\"\
-              \ /> \n    <Data Name=\"EventType\">WmiConsumerEvent</Data> \n    <Data\
-              \ Name=\"UtcTime\">2018-09-12 00:41:00.760</Data> \n    <Data Name=\"\
-              Operation\">Created</Data> \n    <Data Name=\"User\">DESKTOP-LFD11QP\\\
-              pedro</Data> \n    <Data Name=\"Name\">\"Updater\"</Data> \n    <Data\
-              \ Name=\"Type\">Command Line</Data> \n    <Data Name=\"Destination\"\
-              >\"C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\
-              \ -nop -exec bypass -win hidden -noni -enc bm90ZXBhZC5leGU=\"</Data>\
-              \ \n  </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T01:04:02.164205800Z\" />\
+              \ \n    <EventRecordID>3631726</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"1432\" ThreadID=\"5672\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"EventType\">WmiConsumerEvent</Data>\
+              \ \n    <Data Name=\"UtcTime\">2019-04-27 01:04:02.164</Data> \n   \
+              \ <Data Name=\"Operation\">Created</Data> \n    <Data Name=\"User\"\
+              >RIVENDELL\\cbrown</Data> \n    <Data Name=\"Name\">\"Updater\"</Data>\
+              \ \n    <Data Name=\"Type\">Command Line</Data> \n    <Data Name=\"\
+              Destination\">\"C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\
+              \\powershell.exe -NonInteractive\"</Data> \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -10174,12 +10871,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 09/12/2018
+            date: 04/26/2019
             description: This event logs the registration of WMI consumers, recording
               the consumer name, log, and destination.
             log_type: sysmon
             sysmon_rule: WmiEvent
-            sysmon_version: '8.08'
+            sysmon_version: '9.01'
             title: Event ID 20 - WmiEvent (WmiEventConsumer activity detected)
           title: 'Event ID 20: WmiEvent (WmiEventConsumer activity detected)'
         '21':
@@ -10228,18 +10925,18 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>21</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>21</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>21</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-09-12T00:47:16.999867600Z\" />\
-              \ \n    <EventRecordID>482300</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2204\" ThreadID=\"3080\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-LFD11QP</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"RuleName\"\
-              \ /> \n    <Data Name=\"EventType\">WmiBindingEvent</Data> \n    <Data\
-              \ Name=\"UtcTime\">2018-09-12 00:47:16.997</Data> \n    <Data Name=\"\
-              Operation\">Created</Data> \n    <Data Name=\"User\">DESKTOP-LFD11QP\\\
-              pedro</Data> \n    <Data Name=\"Consumer\">\"CommandLineEventConsumer.Name=\\\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T01:04:06.885559700Z\" />\
+              \ \n    <EventRecordID>3633050</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"1432\" ThreadID=\"5672\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"EventType\">WmiBindingEvent</Data>\
+              \ \n    <Data Name=\"UtcTime\">2019-04-27 01:04:06.885</Data> \n   \
+              \ <Data Name=\"Operation\">Created</Data> \n    <Data Name=\"User\"\
+              >RIVENDELL\\cbrown</Data> \n    <Data Name=\"Consumer\">\"CommandLineEventConsumer.Name=\\\
               \"Updater\\\"\"</Data> \n    <Data Name=\"Filter\">\"__EventFilter.Name=\\\
               \"Updater\\\"\"</Data> \n  </EventData>\n</Event>"
             type: xml
@@ -10251,14 +10948,47 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 09/12/2018
+            date: 04/26/2019
             description: When a consumer binds to a filter, this event logs the consumer
               name and filter path.
             log_type: sysmon
             sysmon_rule: WmiEvent
-            sysmon_version: '8.08'
+            sysmon_version: '9.01'
             title: Event ID 21 - WmiEvent (WmiEventConsumerToFilter activity detected)
           title: 'Event ID 21: WmiEvent (WmiEventConsumerToFilter activity detected)'
+        '255':
+          description:
+            text: Event Log Illustration
+          event_data:
+            data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
+              >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>255</EventID>\
+              \ \n    <Version>3</Version> \n    <Level>2</Level> \n    <Task>255</Task>\
+              \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:10:34.262645100Z\" />\
+              \ \n    <EventRecordID>3606985</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2336\" ThreadID=\"3124\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              UtcTime\">2019-04-27 00:10:34.254</Data> \n    <Data Name=\"ID\">GetConfigurationOptions</Data>\
+              \ \n    <Data Name=\"Description\">Failed to open service configuration\
+              \ with error 19</Data> \n  </EventData>\n</Event>"
+            type: xml
+          event_log_illustration:
+            image:
+              alt: Event 255 illustration
+              height: 625
+              link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/event-255.png
+              width: 625
+          meta:
+            author: Roberto Rodriguez (@Cyb3rWard0g)
+            date: 04/26/2019
+            description: ''
+            log_type: sysmon
+            sysmon_rule: WmiEvent
+            sysmon_version: '9.01'
+            title: Event ID 255 - Error Report
+          title: 'Event ID 255: Error Report'
         '3':
           data_dictionary:
             dst_ip:
@@ -10354,26 +11084,28 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>3</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>3</EventID>\
               \ \n    <Version>5</Version> \n    <Level>4</Level> \n    <Task>3</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:29:36.333863500Z\" />\
-              \ \n    <EventRecordID>11750109</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2152\" ThreadID=\"3236\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:29:35.394</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-957F-5ACD-0000-0010EB030000}</Data>\
-              \ \n    <Data Name=\"ProcessId\">4</Data> \n    <Data Name=\"Image\"\
-              >System</Data> \n    <Data Name=\"User\">NT AUTHORITY\\SYSTEM</Data>\
-              \ \n    <Data Name=\"Protocol\">udp</Data> \n    <Data Name=\"Initiated\"\
-              >false</Data> \n    <Data Name=\"SourceIsIpv6\">false</Data> \n    <Data\
-              \ Name=\"SourceIp\">192.168.64.255</Data> \n    <Data Name=\"SourceHostname\"\
-              \ /> \n    <Data Name=\"SourcePort\">138</Data> \n    <Data Name=\"\
-              SourcePortName\">netbios-dgm</Data> \n    <Data Name=\"DestinationIsIpv6\"\
-              >false</Data> \n    <Data Name=\"DestinationIp\">192.168.64.135</Data>\
-              \ \n    <Data Name=\"DestinationHostname\">DESKTOP-WARDOG.localdomain</Data>\
-              \ \n    <Data Name=\"DestinationPort\">138</Data> \n    <Data Name=\"\
-              DestinationPortName\">netbios-dgm</Data> \n  </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:10:32.964282300Z\" />\
+              \ \n    <EventRecordID>3606939</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2336\" ThreadID=\"3140\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:10:31.843</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9d71-5cc3-0000-001029c30000}</Data>\
+              \ \n    <Data Name=\"ProcessId\">820</Data> \n    <Data Name=\"Image\"\
+              >C:\\Windows\\System32\\lsass.exe</Data> \n    <Data Name=\"User\">NT\
+              \ AUTHORITY\\SYSTEM</Data> \n    <Data Name=\"Protocol\">tcp</Data>\
+              \ \n    <Data Name=\"Initiated\">true</Data> \n    <Data Name=\"SourceIsIpv6\"\
+              >false</Data> \n    <Data Name=\"SourceIp\">192.168.64.137</Data> \n\
+              \    <Data Name=\"SourceHostname\">DESKTOP-LFD11QP.RIVENDELL.local</Data>\
+              \ \n    <Data Name=\"SourcePort\">49767</Data> \n    <Data Name=\"SourcePortName\"\
+              \ /> \n    <Data Name=\"DestinationIsIpv6\">false</Data> \n    <Data\
+              \ Name=\"DestinationIp\">192.168.64.178</Data> \n    <Data Name=\"DestinationHostname\"\
+              >DC-WD-001</Data> \n    <Data Name=\"DestinationPort\">88</Data> \n\
+              \    <Data Name=\"DestinationPortName\">kerberos</Data> \n  </EventData>\n\
+              </Event>"
             type: xml
           event_log_illustration:
             image:
@@ -10383,12 +11115,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The network connection event logs TCP/UDP connections on
               the machine.
             log_type: sysmon
             sysmon_rule: NetworkConnect
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 3 - Network connection
           title: 'Event ID 3: Network connection'
         '4':
@@ -10422,17 +11154,17 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>4</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>4</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>4</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:36:20.242010600Z\" />\
-              \ \n    <EventRecordID>11753525</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2152\" ThreadID=\"2156\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:36:20.231</Data> \n    <Data Name=\"State\">Stopped</Data>\
-              \ \n    <Data Name=\"Version\">7.01</Data> \n    <Data Name=\"SchemaVersion\"\
-              >4.00</Data> \n  </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:19.522529500Z\" />\
+              \ \n    <EventRecordID>3606988</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              UtcTime\">2019-04-27 00:11:19.522</Data> \n    <Data Name=\"State\"\
+              >Started</Data> \n    <Data Name=\"Version\">9.01</Data> \n    <Data\
+              \ Name=\"SchemaVersion\">4.20</Data> \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -10442,12 +11174,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The service state change event reports the state of the Sysmon
               service (started or stopped).
             log_type: sysmon
             sysmon_rule: cannot be filtered
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 4 - Sysmon service state changed
           title: 'Event ID 4: Sysmon service state changed'
         '5':
@@ -10487,18 +11219,18 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>5</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>5</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>5</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:37:43.157314700Z\" />\
-              \ \n    <EventRecordID>11753935</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:37:43.153</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-9ECD-5ACD-0000-0010EF6BAF00}</Data>\
-              \ \n    <Data Name=\"ProcessId\">2428</Data> \n    <Data Name=\"Image\"\
-              >C:\\Windows\\System32\\backgroundTaskHost.exe</Data> \n  </EventData>\n\
-              </Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:50:17.341188700Z\" />\
+              \ \n    <EventRecordID>3620347</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"1432\" ThreadID=\"6344\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:50:02.357</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-a73a-5cc3-0000-001029ad5f00}</Data>\
+              \ \n    <Data Name=\"ProcessId\">4472</Data> \n    <Data Name=\"Image\"\
+              >C:\\Windows\\System32\\rundll32.exe</Data> \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -10508,11 +11240,11 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The process terminate event reports when a process terminates.
             log_type: sysmon
             sysmon_rule: ProcessTerminate
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 5 - Process terminated
           title: 'Event ID 5: Process terminated'
         '6':
@@ -10560,19 +11292,19 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>6</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>6</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>6</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:21:34.704903800Z\" />\
-              \ \n    <EventRecordID>11744642</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2152\" ThreadID=\"3408\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:21:34.650</Data> \n    <Data Name=\"ImageLoaded\">C:\\\
-              ProgramData\\Microsoft\\Windows Defender\\Definition Updates\\{741285CC-BF49-492C-90BE-E84BD6CADD73}\\\
-              MpKsl4d223a5a.sys</Data> \n    <Data Name=\"Hashes\">SHA1=38310AD6805DC31D5AA61BE182689D63060ACE94,MD5=BF2513029E231BE96D82F7C3ABFF87F4,SHA256=F6DB64112CC50EEE495E2D7C61B8BDBE757A31B03144B0396615FD38C312824E,IMPHASH=06D4A412CF7F5363C49E629BF34446B3</Data>\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:22.407923200Z\" />\
+              \ \n    <EventRecordID>3611351</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3796\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:11:01.735</Data>\
+              \ \n    <Data Name=\"ImageLoaded\">C:\\Windows\\System32\\drivers\\\
+              vmusbmouse.sys</Data> \n    <Data Name=\"Hashes\">SHA1=651C73ABD8BE1B2A9C97FBBD7912A9050B4D555E,MD5=1F211FD46A2C49D0A2D3CF7160726292,SHA256=7AC0FE224B03EA3568A9A6F74A8BC30064DBF1A73A22C4AC89120C669537B31E,IMPHASH=0AC7A1ED563A3C7C6706B591B9D8E120</Data>\
               \ \n    <Data Name=\"Signed\">true</Data> \n    <Data Name=\"Signature\"\
-              >Microsoft Corporation</Data> \n    <Data Name=\"SignatureStatus\">Valid</Data>\
+              >VMware, Inc.</Data> \n    <Data Name=\"SignatureStatus\">Valid</Data>\
               \ \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
@@ -10583,12 +11315,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The driver loaded events provides information about a driver
               being loaded on the system.
             log_type: sysmon
             sysmon_rule: DriverLoad
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 6 - Driver loaded
           title: 'Event ID 6: Driver loaded'
         '7':
@@ -10676,22 +11408,23 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>7</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>7</EventID>\
               \ \n    <Version>3</Version> \n    <Level>4</Level> \n    <Task>7</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:46:18.402515800Z\" />\
-              \ \n    <EventRecordID>11756509</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:46:18.398</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-A12A-5ACD-0000-0010E4C8B300}</Data>\
-              \ \n    <Data Name=\"ProcessId\">3532</Data> \n    <Data Name=\"Image\"\
-              >C:\\Windows\\System32\\cmd.exe</Data> \n    <Data Name=\"ImageLoaded\"\
-              >C:\\Windows\\System32\\msvcrt.dll</Data> \n    <Data Name=\"FileVersion\"\
-              >7.0.16299.125 (WinBuild.160101.0800)</Data> \n    <Data Name=\"Description\"\
-              >Windows NT CRT DLL</Data> \n    <Data Name=\"Product\">Microsoft\xAE\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:22.874806200Z\" />\
+              \ \n    <EventRecordID>3611661</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3796\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:11:02.553</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9e16-5cc3-0000-001062ac0000}</Data>\
+              \ \n    <Data Name=\"ProcessId\">608</Data> \n    <Data Name=\"Image\"\
+              >C:\\Windows\\System32\\csrss.exe</Data> \n    <Data Name=\"ImageLoaded\"\
+              >C:\\Windows\\System32\\sxssrv.dll</Data> \n    <Data Name=\"FileVersion\"\
+              >10.0.17763.437 (WinBuild.160101.0800)</Data> \n    <Data Name=\"Description\"\
+              >Windows SxS Server DLL</Data> \n    <Data Name=\"Product\">Microsoft\xAE\
               \ Windows\xAE Operating System</Data> \n    <Data Name=\"Company\">Microsoft\
-              \ Corporation</Data> \n    <Data Name=\"Hashes\">SHA1=AEB9839D02C99A3E7EED1F12671C3F827221EDF8,MD5=68195105C7D9A2B5DF5BB82ECA521092,SHA256=556FF2B03495E2117223E5697B54253F30BD10ED3C67468947D79945168A624A,IMPHASH=C16CC99941EF5E18707133A2532B7D0C</Data>\
+              \ Corporation</Data> \n    <Data Name=\"Hashes\">SHA1=96BAC143846FCA945A5535DD2F96E3DFA322322F,MD5=B08257DDEACDEFFFCF91A743795CBF11,SHA256=6935D53B5F05833E76F87CA3A2A5C5B5D0EE05DD7953487492C8EDCC9E5F6F8F,IMPHASH=4BF8E692F4BD33947C8B7B301408157E</Data>\
               \ \n    <Data Name=\"Signed\">true</Data> \n    <Data Name=\"Signature\"\
               >Microsoft Windows</Data> \n    <Data Name=\"SignatureStatus\">Valid</Data>\
               \ \n  </EventData>\n</Event>"
@@ -10704,12 +11437,12 @@ OSSEM:
               width: 625
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The image loaded event logs when a module is loaded in a
               specific process.
             log_type: sysmon
             sysmon_rule: ImageLoad
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 7 - Image loaded
           title: 'Event ID 7: Image loaded'
         '8':
@@ -10799,33 +11532,34 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>8</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>8</EventID>\
               \ \n    <Version>2</Version> \n    <Level>4</Level> \n    <Task>8</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:25:04.660177300Z\" />\
-              \ \n    <EventRecordID>11748252</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"2152\" ThreadID=\"3392\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:25:04.658</Data> \n    <Data Name=\"SourceProcessGuid\"\
-              >{A98268C1-9586-5ACD-0000-001070A20000}</Data> \n    <Data Name=\"SourceProcessId\"\
-              >684</Data> \n    <Data Name=\"SourceImage\">C:\\Windows\\System32\\\
-              csrss.exe</Data> \n    <Data Name=\"TargetProcessGuid\">{A98268C1-9C2E-5ACD-0000-00100266AB00}</Data>\
-              \ \n    <Data Name=\"TargetProcessId\">240</Data> \n    <Data Name=\"\
-              TargetImage\">C:\\Windows\\System32\\cmd.exe</Data> \n    <Data Name=\"\
-              NewThreadId\">2336</Data> \n    <Data Name=\"StartAddress\">0x00007FFA356A7E40</Data>\
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:10:32.379011500Z\" />\
+              \ \n    <EventRecordID>3606757</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2336\" ThreadID=\"3652\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>DESKTOP-LFD11QP.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:10:32.363</Data>\
+              \ \n    <Data Name=\"SourceProcessGuid\">{1c9fdc81-9d71-5cc3-0000-00109cad0000}</Data>\
+              \ \n    <Data Name=\"SourceProcessId\">604</Data> \n    <Data Name=\"\
+              SourceImage\">C:\\Windows\\System32\\csrss.exe</Data> \n    <Data Name=\"\
+              TargetProcessGuid\">{1c9fdc81-9d71-5cc3-0000-0010bbbc0000}</Data> \n\
+              \    <Data Name=\"TargetProcessId\">804</Data> \n    <Data Name=\"TargetImage\"\
+              >C:\\Windows\\System32\\services.exe</Data> \n    <Data Name=\"NewThreadId\"\
+              >6992</Data> \n    <Data Name=\"StartAddress\">0x00007FFB26853970</Data>\
               \ \n    <Data Name=\"StartModule\">C:\\WINDOWS\\System32\\KERNELBASE.dll</Data>\
               \ \n    <Data Name=\"StartFunction\">CtrlRoutine</Data> \n  </EventData>\n\
               </Event>"
             type: xml
           meta:
             author: Roberto Rodriguez (@Cyb3rWard0g)
-            date: 04/11/2018
+            date: 04/26/2019
             description: The CreateRemoteThread event detects when a process creates
               a thread in another process.
             log_type: sysmon
             sysmon_rule: CreateRemoteThread
-            sysmon_version: '7.01'
+            sysmon_version: '9.01'
             title: Event ID 8 - CreateRemoteThread
           title: 'Event ID 8: CreateRemoteThread'
         '9':
@@ -10867,18 +11601,19 @@ OSSEM:
           event_data:
             data: "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"\
               >\n  <System>\n    <Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"\
-              {5770385F-C22A-43E0-BF4C-06F5698FFBD9}\" /> \n    <EventID>9</EventID>\
+              {5770385f-c22a-43e0-bf4c-06f5698ffbd9}\" /> \n    <EventID>9</EventID>\
               \ \n    <Version>2</Version> \n    <Level>4</Level> \n    <Task>9</Task>\
               \ \n    <Opcode>0</Opcode> \n    <Keywords>0x8000000000000000</Keywords>\
-              \ \n    <TimeCreated SystemTime=\"2018-04-11T05:51:46.575087700Z\" />\
-              \ \n    <EventRecordID>11758084</EventRecordID> \n    <Correlation />\
-              \ \n    <Execution ProcessID=\"6028\" ThreadID=\"4132\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
-              \ \n    <Computer>DESKTOP-WARDOG</Computer> \n    <Security UserID=\"\
-              S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"UtcTime\"\
-              >2018-04-11 05:51:46.571</Data> \n    <Data Name=\"ProcessGuid\">{A98268C1-959B-5ACD-0000-0010EFD50200}</Data>\
-              \ \n    <Data Name=\"ProcessId\">2708</Data> \n    <Data Name=\"Image\"\
-              >C:\\Windows\\System32\\svchost.exe</Data> \n    <Data Name=\"Device\"\
-              >\\Device\\HarddiskVolume2</Data> \n    </EventData>\n</Event>"
+              \ \n    <TimeCreated SystemTime=\"2019-04-27T00:11:20.686207100Z\" />\
+              \ \n    <EventRecordID>3610045</EventRecordID> \n    <Correlation />\
+              \ \n    <Execution ProcessID=\"2332\" ThreadID=\"3784\" /> \n    <Channel>Microsoft-Windows-Sysmon/Operational</Channel>\
+              \ \n    <Computer>WARDOG.RIVENDELL.local</Computer> \n    <Security\
+              \ UserID=\"S-1-5-18\" /> \n  </System>\n  <EventData>\n    <Data Name=\"\
+              RuleName\" /> \n    <Data Name=\"UtcTime\">2019-04-27 00:11:19.430</Data>\
+              \ \n    <Data Name=\"ProcessGuid\">{1c9fdc81-9e20-5cc3-0000-0010a3d60300}</Data>\
+              \ \n    <Data Name=\"ProcessId\">2864</Data> \n    <Data Name=\"Image\"\
+              >C:\\Windows\\System32\\wbem\\WmiPrvSE.exe</Data> \n    <Data Name=\"\
+              Device\">\\Device\\Harddisk0\\DR0</Data> \n  </EventData>\n</Event>"
             type: xml
           event_log_illustration:
             image:
@@ -10887,18 +11622,30 @@ OSSEM:
               link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/event-9.png
               width: 625
           meta:
-            date: 04/11/2018
+            date: 04/26/2019
             description: The RawAccessRead event detects when a process conducts reading
               operations from the drive using the
             title: Event ID 9 - RawAccessRead
           title: 'Event ID 9: RawAccessRead'
         README: null
+        sysmon9_0_1.tar.gz: null
+        sysmon_manifest_4.2.xml: null
       windowsdefenderatp:
         AlertEvents:
           data_dictionary:
-            ? ''
-            : description: Table that contains the details of the event
-              field_name: Table
+            alert_id:
+              description: Unique identifier for the alert
+              field_name: AlertId
+              sample_value: ''
+              type: string
+            category:
+              description: ''
+              field_name: Category
+              sample_value: ''
+              type: ''
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -10906,12 +11653,55 @@ OSSEM:
               field_name: EventTime
               sample_value: ''
               type: date
+            file_name:
+              description: Name of the file that the recorded action was applied to
+              field_name: FileName
+              sample_value: ''
+              type: string
             hash_sha1:
               description: "\xDF  SHA-1 of the file that the recorded action was applied\
                 \ to"
               field_name: SHA1
               sample_value: ''
               type: string
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
+              sample_value: ''
+              type: string
+            remote_ip:
+              description: IP address that was being connected to
+              field_name: RemoteIP
+              sample_value: ''
+              type: string
+            remote_url:
+              description: URL or fully qualified domain name (FQDN) that was being
+                connected to
+              field_name: RemoteUrl
+              sample_value: ''
+              type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
+            severity:
+              description: ''
+              field_name: Severity
+              sample_value: ''
+              type: ''
+            table:
+              description: Table that contains the details of the event
+              field_name: Table
+              sample_value: ''
+              type: string
+            title:
+              description: ''
+              field_name: Title
+              sample_value: ''
+              type: ''
           description:
             text: Alerts on Windows Defender Security Center
           meta:
@@ -10923,11 +11713,22 @@ OSSEM:
           title: AlertEvents
         FileCreationEvents:
           data_dictionary:
-            ? ''
-            : description: ''
-              field_name: IsAzureInfoProtectionApplied
+            action_type:
+              description: Type of activity that triggered the event
+              field_name: ActionType
               sample_value: ''
-              type: ''
+              type: string
+            app_guard_container_id:
+              description: Identifier for the virtualized container used by Application
+                Guard to isolate browser activity
+              field_name: AppGuardContainerId
+              sample_value: ''
+              type: string
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
+              sample_value: ''
+              type: string
             event_date_creation:
               description: Date and time when the event was recorded
               field_name: EventTime
@@ -10936,6 +11737,21 @@ OSSEM:
             file_name:
               description: Name of the file that the recorded action was applied to
               field_name: FileName
+              sample_value: ''
+              type: string
+            file_origin_ip:
+              description: IP address where the file was downloaded from
+              field_name: FileOriginIP
+              sample_value: ''
+              type: string
+            file_origin_reference_url:
+              description: URL of the web page that links to the downloaded file
+              field_name: FileOriginReferenceUrl
+              sample_value: ''
+              type: string
+            file_origin_url:
+              description: URL where the file was downloaded from
+              field_name: FileOriginUrl
               sample_value: ''
               type: string
             file_path:
@@ -10960,6 +11776,21 @@ OSSEM:
               description: SHA-256 of the file that the recorded action was applied
                 to. This field is usually not populated-use the SHA1 column when available.
               field_name: SHA256
+              sample_value: ''
+              type: string
+            is_azure_info_protection_applied:
+              description: ''
+              field_name: IsAzureInfoProtectionApplied
+              sample_value: ''
+              type: ''
+            is_windows_infor_protection_applied:
+              description: ''
+              field_name: IsWindowsInfoProtectionApplied
+              sample_value: ''
+              type: ''
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
               sample_value: ''
               type: string
             md5_hash:
@@ -11029,6 +11860,23 @@ OSSEM:
               field_name: InitiatingProcessTokenElevation
               sample_value: ''
               type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
+            sensitivity_label:
+              description: ''
+              field_name: SensitivityLabel
+              sample_value: ''
+              type: ''
+            sensitivity_sublabel:
+              description: ''
+              field_name: SensitivitySubLabel
+              sample_value: ''
+              type: ''
             sha1_hash:
               description: SHA-1 of the process (image file) that initiated the event
               field_name: InitiatingProcessSHA1
@@ -11063,10 +11911,20 @@ OSSEM:
           title: FileCreationEvents
         ImageLoadEvents:
           data_dictionary:
-            ? ''
-            : description: Identifier for the virtualized container used by Application
+            action_type:
+              description: Type of activity that triggered the event
+              field_name: ActionType
+              sample_value: ''
+              type: string
+            app_guard_container_id:
+              description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
+              sample_value: ''
+              type: string
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -11095,6 +11953,11 @@ OSSEM:
               description: SHA-1 of the file that the recorded action was applied
                 to
               field_name: SHA1
+              sample_value: ''
+              type: string
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
               sample_value: ''
               type: string
             process_command_line:
@@ -11169,6 +12032,13 @@ OSSEM:
               field_name: InitiatingProcessTokenElevation
               sample_value: ''
               type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
             user_domain:
               description: Domain of the account that ran the process responsible
                 for the event
@@ -11198,10 +12068,25 @@ OSSEM:
           title: ImageLoadEvents
         LogonEvents:
           data_dictionary:
-            ? ''
-            : description: Identifier for the virtualized container used by Application
+            action_type:
+              description: Type of activity that triggered the event
+              field_name: ActionType
+              sample_value: ''
+              type: string
+            additional_fields:
+              description: Additional information about the event in JSON array format
+              field_name: AdditionalFields
+              sample_value: ''
+              type: string
+            app_guard_container_id:
+              description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
+              sample_value: ''
+              type: string
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
               sample_value: ''
               type: string
             dst_host_name:
@@ -11228,6 +12113,22 @@ OSSEM:
               field_name: EventTime
               sample_value: ''
               type: date
+            logon_id:
+              description: Identifier for a logon session. This identifier is unique
+                on the same machine only between restarts.
+              field_name: LogonId
+              sample_value: ''
+              type: string
+            logon_type:
+              description: Type of logon session
+              field_name: LogonType
+              sample_value: ''
+              type: string
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
+              sample_value: ''
+              type: string
             process_command_line:
               description: Command line used to run the process that initiated the
                 event
@@ -11318,6 +12219,19 @@ OSSEM:
               field_name: InitiatingProcessAccountSid
               sample_value: ''
               type: string
+            remote_ip_type:
+              description: Type of IP address, for example Public, Private, Reserved,
+                Loopback, Teredo, FourToSixMapping, and Broadcast
+              field_name: RemoteIPType
+              sample_value: ''
+              type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
             user_domain:
               description: Domain of the account
               field_name: AccountDomain
@@ -11344,16 +12258,80 @@ OSSEM:
           title: LogonEvents
         MachineInfo:
           data_dictionary:
-            ? ''
-            : description: ''
-              field_name: OSVersion
+            client_version:
+              description: ''
+              field_name: ClientVersion
               sample_value: ''
               type: ''
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
+              sample_value: ''
+              type: string
             event_date_creation:
               description: Date and time when the event was recorded
               field_name: EventTime
               sample_value: ''
               type: date
+            is_azure_ad_joined:
+              description: Boolean indicator of whether machine is joined to the Azure
+                Active Directory
+              field_name: ISAzureADJoined
+              sample_value: ''
+              type: boolean
+            logged_on_users:
+              description: List of all users that are logged on the machine at the
+                time of the event in JSON array format
+              field_name: LoggedOnUsers
+              sample_value: ''
+              type: string
+            machine_group:
+              description: Machine group of the machine. This group is used by role-based
+                access control to determine access to the machine.
+              field_name: MachineGroup
+              sample_value: ''
+              type: string
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
+              sample_value: ''
+              type: string
+            os_architecture:
+              description: Architecture of the operating system running on the machine
+              field_name: OSArchitecture
+              sample_value: ''
+              type: string
+            os_build:
+              description: Build version of the operating system running on the machine
+              field_name: OSBuild
+              sample_value: ''
+              type: string
+            os_platform:
+              description: Platform of the operating system running on the machine.
+                This indicates specific operating systems, including variations within
+                the same family, such as Windows 10 and Windows 7.
+              field_name: OSPlatform
+              sample_value: ''
+              type: string
+            os_version:
+              description: ''
+              field_name: OSVersion
+              sample_value: ''
+              type: ''
+            public_ip:
+              description: Public IP address used by the onboarded machine to connect
+                to the Windows Defender ATP service. This could be the IP address
+                of the machine itself, a NAT device, or a proxy.
+              field_name: PublicIP
+              sample_value: ''
+              type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
           description:
             text: Machine information, including OS information
           meta:
@@ -11365,11 +12343,27 @@ OSSEM:
           title: MachineInfo
         MachineNetworkInfo:
           data_dictionary:
-            ? ''
-            : description: JSON array containing all the IP addresses assigned to
-                the adapter, along with their respective subnet prefix and IP address
-                space, such as public, private, or link-local
-              field_name: IPAddresses
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
+              sample_value: ''
+              type: string
+            connected_network:
+              description: Networks that the adapter is connected to. Each JSON array
+                contains the network name, category (public, private or domain), a
+                description, and a flag indicating if it's connected publicly to the
+                internet.
+              field_name: ConnectedNetwork
+              sample_value: ''
+              type: string
+            default_gateways:
+              description: Default gateway addresses in JSON array format
+              field_name: DefaultGateways
+              sample_value: ''
+              type: string
+            dns_address:
+              description: DNS server addresses in JSON array format
+              field_name: DnsAddress
               sample_value: ''
               type: string
             event_date_creation:
@@ -11377,6 +12371,61 @@ OSSEM:
               field_name: EventTime
               sample_value: ''
               type: date
+            ip_address:
+              description: JSON array containing all the IP addresses assigned to
+                the adapter, along with their respective subnet prefix and IP address
+                space, such as public, private, or link-local
+              field_name: IPAddresses
+              sample_value: ''
+              type: string
+            ipv4_dhcp:
+              description: IPv4 address of DHCP server
+              field_name: IPv4Dhcp
+              sample_value: ''
+              type: string
+            ipv6_dhcp:
+              description: IPv6 address of DHCP server
+              field_name: IPv6Dhcp
+              sample_value: ''
+              type: string
+            mac_address:
+              description: string
+              field_name: MacAddress
+              sample_value: MAC address of the network adapter
+              type: ''
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
+              sample_value: ''
+              type: string
+            network_adapter_name:
+              description: Name of the network adapter
+              field_name: NetworkAdapterName
+              sample_value: ''
+              type: string
+            network_adapter_status:
+              description: Operational status of the network adapter
+              field_name: NetworkAdapterStatus
+              sample_value: ''
+              type: string
+            network_adapter_type:
+              description: Network adapter type
+              field_name: NetworkAdapterType
+              sample_value: ''
+              type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
+            tunnel_type:
+              description: Tunneling protocol, if the interface is used for this purpose,
+                for example 6to4, Teredo, ISATAP, PPTP, SSTP, and SSH
+              field_name: TunnelType
+              sample_value: ''
+              type: string
           description:
             text: Network properties of machines, including adapters, IP and MAC addresses,
               as well as connected networks and domains
@@ -11390,10 +12439,25 @@ OSSEM:
           title: MachineNetworkInfo
         MiscEvents:
           data_dictionary:
-            ? ''
-            : description: Identifier for the virtualized container used by Application
+            action_type:
+              description: Type of activity that triggered the event
+              field_name: ActionType
+              sample_value: ''
+              type: string
+            additional_fields:
+              description: Additional information about the event in JSON array format
+              field_name: AdditionalFields
+              sample_value: ''
+              type: string
+            app_guard_container_id:
+              description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
+              sample_value: ''
+              type: string
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -11401,6 +12465,27 @@ OSSEM:
               field_name: EventTime
               sample_value: ''
               type: date
+            file_name:
+              description: Name of the file that the recorded action was applied to
+              field_name: FileName
+              sample_value: ''
+              type: string
+            file_origin_ip:
+              description: IP address where the file was downloaded from
+              field_name: FileOriginIP
+              sample_value: ''
+              type: string
+            file_origin_url:
+              description: URL where the file was downloaded from
+              field_name: FileOriginUrl
+              sample_value: ''
+              type: string
+            folder_path:
+              description: Folder containing the file that the recorded action was
+                applied to
+              field_name: FolderPath
+              sample_value: ''
+              type: string
             hash_md5:
               description: MD5 hash of the file that the recorded action was applied
                 to
@@ -11413,16 +12498,186 @@ OSSEM:
               field_name: SHA1
               sample_value: ''
               type: string
+            iniating_process_sha1:
+              description: SHA-1 of the process (image file) that initiated the event
+              field_name: InitiatingProcessSHA1
+              sample_value: ''
+              type: string
+            iniating_process_sha256:
+              description: SHA-256 of the process (image file) that initiated the
+                event. This field is usually not populated-use the SHA1 column when
+                available.
+              field_name: InitiatingProcessSHA256
+              sample_value: ''
+              type: string
+            initiating_process_account_domain:
+              description: Domain of the account that ran the process responsible
+                for the event
+              field_name: InitiatingProcessAccountDomain
+              sample_value: ''
+              type: string
+            initiating_process_account_name:
+              description: User name of the account that ran the process responsible
+                for the event
+              field_name: InitiatingProcessAccountName
+              sample_value: ''
+              type: string
+            initiating_process_account_sid:
+              description: Security Identifier (SID) of the account that ran the process
+                responsible for the event
+              field_name: InitiatingProcessAccountSid
+              sample_value: ''
+              type: string
+            initiating_process_command_line:
+              description: Command line used to run the process that initiated the
+                event
+              field_name: InitiatingProcessCommandLine
+              sample_value: ''
+              type: string
+            initiating_process_creation_time:
+              description: Date and time when the process that initiated the event
+                was started
+              field_name: InitiatingProcessCreationTime
+              sample_value: ''
+              type: date
+            initiating_process_file_name:
+              description: Name of the process that initiated the event
+              field_name: InitiatingProcessFileName
+              sample_value: ''
+              type: string
+            initiating_process_folder_path:
+              description: Folder containing the process (image file) that initiated
+                the event
+              field_name: InitiatingProcessFolderPath
+              sample_value: ''
+              type: string
+            initiating_process_id:
+              description: Process ID (PID) of the process that initiated the event
+              field_name: InitiatingProcessId
+              sample_value: ''
+              type: int
+            initiating_process_logon_id:
+              description: Identifier for a logon session of the process that initiated
+                the event. This identifier is unique on the same machine only between
+                restarts.
+              field_name: InitiatingProcessLogonId
+              sample_value: ''
+              type: string
+            initiating_process_md5:
+              description: MD5 hash of the process (image file) that initiated the
+                event
+              field_name: InitiatingProcessMD5
+              sample_value: ''
+              type: string
+            initiating_process_parent_creation_time:
+              description: Date and time when the parent of the process responsible
+                for the event was started
+              field_name: InitiatingProcessParentCreationTime
+              sample_value: ''
+              type: date
+            initiating_process_parent_file_name:
+              description: Name of the parent process that spawned the process responsible
+                for the event
+              field_name: InitiatingProcessParentFileName
+              sample_value: ''
+              type: string
+            initiating_process_parent_id:
+              description: Process ID (PID) of the parent process that spawned the
+                process responsible for the event
+              field_name: InitiatingProcessParentId
+              sample_value: ''
+              type: int
+            local_ip:
+              description: IP address assigned to the local machine used during communication
+              field_name: LocalIP
+              sample_value: ''
+              type: string
+            local_port:
+              description: TCP port on the local machine used during communication
+              field_name: LocalPort
+              sample_value: ''
+              type: int
+            logon_id:
+              description: Identifier for a logon session. This identifier is unique
+                on the same machine only between restarts.
+              field_name: LogonId
+              sample_value: ''
+              type: string
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
+              sample_value: ''
+              type: string
             process_command_line:
               description: Command line used to create the new process
               field_name: ProcessCommandLine
               sample_value: ''
               type: string
+            process_creation_time:
+              description: Date and time the process was created
+              field_name: ProcessCreationTime
+              sample_value: ''
+              type: date
             process_id:
               description: Process ID (PID) of the newly created process
               field_name: ProcessId
               sample_value: ''
               type: int
+            process_token_elevation:
+              description: Token type indicating the presence or absence of User Access
+                Control (UAC) privilege elevation applied to the newly created process
+              field_name: ProcessTokenElevation
+              sample_value: ''
+              type: string
+            registry_key:
+              description: Registry key that the recorded action was applied to
+              field_name: RegistryKey
+              sample_value: ''
+              type: string
+            registry_value_data:
+              description: Data of the registry value that the recorded action was
+                applied to
+              field_name: RegistryValueData
+              sample_value: ''
+              type: string
+            registry_value_name:
+              description: Name of the registry value that the recorded action was
+                applied to
+              field_name: RegistryValueName
+              sample_value: ''
+              type: string
+            remote_computer_name:
+              description: Name of the machine that performed a remote operation on
+                the affected machine. Depending on the event being reported, this
+                name could be a fully-qualified domain name (FQDN), a NetBIOS name,
+                or a host name without domain information.
+              field_name: RemoteComputerName
+              sample_value: ''
+              type: string
+            remote_ip:
+              description: IP address that was being connected to
+              field_name: RemoteIP
+              sample_value: ''
+              type: string
+            remote_port:
+              description: TCP port on the remote device that was being connected
+                to
+              field_name: RemotePort
+              sample_value: ''
+              type: int
+            remote_url:
+              description: URL or fully qualified domain name (FQDN) that was being
+                connected to
+              field_name: RemoteUrl
+              sample_value: ''
+              type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
             user_domain:
               description: Domain of the account
               field_name: AccountDomain
@@ -11451,10 +12706,20 @@ OSSEM:
           title: MiscEvents
         NetworkCommunicationEvents:
           data_dictionary:
-            ? ''
-            : description: Identifier for the virtualized container used by Application
+            action_type:
+              description: Type of activity that triggered the event
+              field_name: ActionType
+              sample_value: ''
+              type: string
+            app_guard_container_id:
+              description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
+              sample_value: ''
+              type: string
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
               sample_value: ''
               type: string
             dst_host_name:
@@ -11494,6 +12759,11 @@ OSSEM:
             hash_sha1:
               description: SHA-1 of the process (image file) that initiated the event
               field_name: InitiatingProcessSHA1
+              sample_value: ''
+              type: string
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
               sample_value: ''
               type: string
             network_protocol:
@@ -11562,6 +12832,13 @@ OSSEM:
               field_name: InitiatingProcessTokenElevation
               sample_value: ''
               type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
             src_ip:
               description: IP address assigned to the local machine used during communication
               field_name: LocalIP
@@ -11607,10 +12884,20 @@ OSSEM:
           title: NetworkCommunicationEvents
         ProcessCreationEvents:
           data_dictionary:
-            ? ''
-            : description: Identifier for the virtualized container used by Application
+            action_type:
+              description: Type of activity that triggered the event
+              field_name: ActionType
+              sample_value: ''
+              type: string
+            app_guard_container_id:
+              description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
+              sample_value: ''
+              type: string
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -11634,6 +12921,29 @@ OSSEM:
               description: SHA-256 of the file that the recorded action was applied
                 to. This field is usually not populated-use the SHA1 column when available.
               field_name: SHA256
+              sample_value: ''
+              type: string
+            initiating_process_parent_creation_time:
+              description: Date and time when the parent of the process responsible
+                for the event was started
+              field_name: InitiatingProcessParentCreationTime
+              sample_value: ''
+              type: date
+            initiating_process_parent_file_name:
+              description: Name of the parent process that spawned the process responsible
+                for the event
+              field_name: InitiatingProcessParentFileName
+              sample_value: ''
+              type: string
+            initiating_process_parent_id:
+              description: Process ID (PID) of the parent process that spawned the
+                process responsible for the event
+              field_name: InitiatingProcessParentId
+              sample_value: ''
+              type: int
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
               sample_value: ''
               type: string
             process_command_line:
@@ -11762,6 +13072,13 @@ OSSEM:
               field_name: ProcessTokenElevation
               sample_value: ''
               type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
             user_domain:
               description: Domain of the account
               field_name: AccountDomain
@@ -11795,10 +13112,20 @@ OSSEM:
         README: null
         RegistryEvents:
           data_dictionary:
-            ? ''
-            : description: Identifier for the virtualized container used by Application
+            action_type:
+              description: Type of activity that triggered the event
+              field_name: ActionType
+              sample_value: ''
+              type: string
+            app_guard_container_id:
+              description: Identifier for the virtualized container used by Application
                 Guard to isolate browser activity
               field_name: AppGuardContainerId
+              sample_value: ''
+              type: string
+            computer_name:
+              description: Fully qualified domain name (FQDN) of the machine
+              field_name: ComputerName
               sample_value: ''
               type: string
             event_date_creation:
@@ -11815,6 +13142,21 @@ OSSEM:
             hash_sha1:
               description: SHA-1 of the process (image file) that initiated the event
               field_name: InitiatingProcessSHA1
+              sample_value: ''
+              type: string
+            machine_id:
+              description: Unique identifier for the machine in the service
+              field_name: MachineId
+              sample_value: ''
+              type: string
+            previous_registry_value_data:
+              description: Original data of the registry value before it was modified
+              field_name: PreviousRegistryValueData
+              sample_value: ''
+              type: string
+            previous_registry_value_name:
+              description: Original name of the registry value before it was modified
+              field_name: PreviousRegistryValueName
               sample_value: ''
               type: string
             process_command_line:
@@ -11883,6 +13225,31 @@ OSSEM:
               field_name: RegistryKey
               sample_value: ''
               type: string
+            registry_value_data:
+              description: Data of the registry value that the recorded action was
+                applied to
+              field_name: RegistryValueData
+              sample_value: ''
+              type: string
+            registry_value_name:
+              description: Name of the registry value that the recorded action was
+                applied to
+              field_name: RegistryValueName
+              sample_value: ''
+              type: string
+            registry_value_type:
+              description: Data type, such as binary or string, of the registry value
+                that the recorded action was applied to
+              field_name: RegistryValueType
+              sample_value: ''
+              type: string
+            report_id:
+              description: Event identifier based on a repeating counter. To identify
+                unique events, this column must be used in conjunction with the ComputerName
+                and EventTime columns.
+              field_name: ReportId
+              sample_value: ''
+              type: long
             user_domain:
               description: Domain of the account that ran the process responsible
                 for the event
@@ -12971,6 +14338,8 @@ OSSEM:
         link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/event-20.png
       21.png:
         link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/event-21.png
+      255.png:
+        link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/event-255.png
       3.png:
         link: https://github.com/Cyb3rWard0g/OSSEM/blob/master/resources/images/event-3.png
       4.png:
