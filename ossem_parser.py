@@ -453,10 +453,22 @@ class OSSEMParser(object):
 
         return ossem
 
+def subset(subset, ossem):
+    ossem = ossem['OSSEM']
+    keys = subset.split('.')
+    for k in keys:
+        if k not in ossem:
+            print("Invalid subset doesn't exist in OSSEM data model")
+            sys.exit()
+        else:
+            ossem = ossem[k]
+    return ossem
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='parse markdown file')
     parser.add_argument('--ossem', type=str, help='base directory containing the OSSEM project')
     parser.add_argument('--output', '-o', type=str, help='output format (json, yaml, xml, or python supported)', default='yaml')
+    parser.add_argument('--subset', '-s', type=str, help='output only a subset of OSSEM. example data_dictionaries.windows.sysmon')
     args = parser.parse_args()
 
     valid_output = ['json', 'yaml', 'xml', 'python'] # should we add markdown as output?
@@ -468,6 +480,8 @@ if __name__ == '__main__':
     if args.ossem:
         parser = OSSEMParser()
         ossem = parser.parse_ossem(args.ossem)
+        if args.subset:
+            ossem = subset(args.subset, ossem)
         if output_format == 'json':
             print(json.dumps(ossem))
         elif output_format == 'yaml':
