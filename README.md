@@ -12,7 +12,8 @@ Extract a subset of data. For example, just sysmon events:
 
 ## Some use cases:
 Write all sysmon events to their own json files:
-```from data.ossem import ossem
+```
+from data.ossem import ossem
 import json
 sysmon_events = ossem['OSSEM']['data_dictionaries']['windows']['sysmon']
 sysmon_events = {key: sysmon_events[key] for key in sysmon_events.keys() if key.isnumeric()}
