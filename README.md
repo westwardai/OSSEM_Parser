@@ -3,10 +3,11 @@ Parser that takes the OSSEM data model as input and generates a YAML file as out
 
 
 ## Usage:
+Generate initial data set:  
 ```python3 ossem_parser.py --ossem ../<path-to-ossem> --output yaml```
 Supported output formats are python, yaml, xml, and json.
 
-Extract a subset of data. For example, just sysmon events:
+Extract a subset of data. For example, just sysmon events:  
 ```python3 ossem_parser.py --ossem ../OSSEM --subset data_dictionaries.windows.sysmon```
 
 ## Some use cases:
