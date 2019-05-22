@@ -455,7 +455,11 @@ class OSSEMParser(object):
 
 def subset(subset, ossem):
     ossem = ossem['OSSEM']
-    keys = subset.split('.')
+    keys = []
+    if '.' in subset:
+        keys = subset.split('.')
+    else:
+        keys = [subset]
     for k in keys:
         if k not in ossem:
             print("Invalid subset doesn't exist in OSSEM data model")
